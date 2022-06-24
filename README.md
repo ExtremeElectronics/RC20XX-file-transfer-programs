@@ -1,5 +1,5 @@
 # RC20XX-file-transfer-programs
-Python programs to transfer CPM files to/from PC to RC2040 and RC2014
+Python programs to transfer CPM files to/from PC to RC2040 and RC2014 with an XK SD card interface.
 
 Transfer / delete/ list files via the serial port (or usb serial port) 
 
