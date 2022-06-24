@@ -22,3 +22,6 @@ the path is only used on the host.
 ## LS-RC20xx.py
 Lists a directory on the CPM Filesystem 
 Takes COM port CPM Drive letter
+
+## EXIT-RC20xx.py
+Sends a code to release the RC2040 from serial file mode. (not needed on the RC2014)
