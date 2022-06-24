@@ -12,6 +12,8 @@ The filename part of the filepath will be used as the CPM file name when the fil
 
 Drive letters are from A to P and are required for all programs except EXIT
 
+The SD card must be using an img style CPM image and you will need to add the img diskdefs to your SD card from https://github.com/ExtremeElectronics/RC2040/blob/main/DiskDefs/RC2040img_diskdefs.txt to a file called diskdefs (no extension)
+
 ## RM-RC20xx.py
 Removes a file on the host CMP system 
 Takes COM port CPM Drive letter and CPM filename
