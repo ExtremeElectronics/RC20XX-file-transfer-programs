@@ -7,8 +7,8 @@ import argparse
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        usage="%(prog)s [PORT] [DRIVE] ...",
-        description="Remove CPM File on RC20XX."
+        usage="%(prog)s [PORT] ...",
+        description="EXIT Serial File Mode on RC2040."
     )
     parser.add_argument(
         "-v", "--version", action="version",
@@ -16,9 +16,6 @@ def init_argparse() -> argparse.ArgumentParser:
     )
 
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
-    parser.add_argument('drive', help="CPM Drive on the Attached RC20XX")
-    parser.add_argument('filename', help="local CPM file and file to save on the Attached RC20XX")
-    
     return parser
 
 parser = init_argparse()
@@ -27,20 +24,17 @@ args = parser.parse_args()
 debug=0
 serialport=args.port.upper()
 if serialport=="": serialport="COM1"
-drive=args.drive.upper()
-if drive=="": drive="A"
 
-filename=args.filename
 
 try:
   ser = serial.Serial(serialport, 115200, timeout=5)  # open serial port
 except:
-  print ("Can't open serial port ",serialport)
+  print ("Cant open serial port ",serialport)
   sys.exit(1)
   
 if debug : print(ser.name)         # check which port was really used
 
-StartToken = "&&&-magic-XXX"
+StartToken = "EXIT"
 EndToken = "XXX-magic-&&&"
 crlf='\n';
 
@@ -81,20 +75,12 @@ ser.flushInput()
 time.sleep(0.1)
 
 WriteRead(StartToken)
-WriteRead("RM")
-WriteRead(drive)
-
-if b"OK" not in WriteRead(filename) :#read OK
-   print ("No OK returned")
-   ser.close()
-   sys.exit(1)
-   
-
-
+#WriteRead("EXIT")
 ser.close()             # close port
 
-print ("Removed",filename)
-#WriteRead(EndToken)
+
+  
+print ("EXIT")
 
 
 

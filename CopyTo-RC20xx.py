@@ -8,7 +8,7 @@ import os.path
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        usage="%(prog)s [PORT] [DRIVE] ...",
+        usage="%(prog)s [PORT] [DRIVE] [filepath]...",
         description="List CPM Directory on RC20XX."
     )
     parser.add_argument(
@@ -108,6 +108,7 @@ WriteRead(drive)
 
 if b"OK" not in WriteRead(filename) :#read OK
    print ("No OK returned")
+   ser.close() 
    sys.exit(1)
    
 localfile = open(filepath, "rb")
@@ -137,6 +138,7 @@ if debug :print("send zero CS");
 #ReadOnly()
 if b"OK" not in WriteRead("0"):
    print ("No OK returned")
+   ser.close() 
    sys.exit(1)
    
 end = time.time()

@@ -8,7 +8,7 @@ import os
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        usage="%(prog)s [PORT] [DRIVE] ...",
+        usage="%(prog)s [PORT] [DRIVE] [filepath] ...",
         description="List CPM Directory on RC20XX."
     )
     parser.add_argument(
@@ -25,7 +25,7 @@ def init_argparse() -> argparse.ArgumentParser:
 parser = init_argparse()
 args = parser.parse_args()
 
-debug=1
+debug=0
 
 serialport=args.port.upper()
 if serialport=="": serialport="COM1"
@@ -40,11 +40,13 @@ if debug:print(filepath,filename)
 
 if filename=="":
     print ("Filename can't be empty")
+    
     sys.exit(1)
     
     
 if len(filename)>12:
     print ("Filename must be 8.3 formatted")
+    
     sys.exit(1)
 
 try:
@@ -104,6 +106,7 @@ WriteRead(drive)
 if debug :print("wait for OK");
 if b"OK" not in WriteRead(filename): #read OK
    print ("No OK returned")
+   ser.close() 
    sys.exit(1)
    
 if debug :print("wait for filename");
