@@ -4,8 +4,8 @@ Python programs to transfer CPM files to/from PC to RC2040 and RC2014 with an XK
 Transfer / delete/ list files via the serial port (or usb serial port) 
 
 The port needs to be the COM port connected to the RC20xx, the program needs exclusive access to this port, no other serial program must be running
-On Windoes machines the com port will be of the form COMxx 
-On Linux machines the port will be obvious to anyone that uses linux :) ( something like tty1, I haven't tried this yet)
+On Windows machines the com port will be of the form COMxx 
+On Linux machines the port will be similar to /dev/ttyAMA0 (USB on a pi) , /dev/tty0 or /dev/ttyS0  
 
 In all cases the file path is for the machine running the python program. 
 The filename part of the filepath will be used as the CPM file name when the file is transferred
