@@ -22,7 +22,7 @@ parser = init_argparse()
 args = parser.parse_args()
 
 debug=0
-serialport=args.port.upper()
+serialport=args.port #.upper()
 if serialport=="": serialport="COM1"
 
 

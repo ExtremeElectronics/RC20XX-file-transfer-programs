@@ -28,7 +28,7 @@ args = parser.parse_args()
 debug=0
 bufsize=(3*1024) #needs to be divisable by 3 &4
 
-serialport=args.port.upper()
+serialport=args.port #.upper()
 if serialport=="": serialport="COM1"
 
 drive=args.drive.upper()
@@ -147,7 +147,7 @@ ser.close()             # close port
 
 
 print (filepath+" Sent")
-if debug: print("in ",end-start);
+print("in ",end-start);
 
 
 
