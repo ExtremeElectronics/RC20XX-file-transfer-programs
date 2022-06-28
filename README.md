@@ -42,3 +42,11 @@ Arguments of COM port and CPM Drive letter required
 ## EXIT-RC20xx.py
 Sends a code to release the RC2040 from serial file mode. (not needed on the RC2014)
 Argument, needs com port only 
+
+## Speed
+CopyTo and CopyFrom give an idea of transfer speed. 
+around 15Kb/s (0.72 mZ/s)* should be doable for CopyTo 
+and 52Kb/s (0.53 mZ/s)* for CopyFrom
+
+* milli Zorks a second, where 1 ZORK=96K
+
