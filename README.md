@@ -45,8 +45,8 @@ Argument, needs com port only
 
 ## Speed
 CopyTo and CopyFrom give an idea of transfer speed. 
-around 15Kb/s (0.72 mZ/s)* should be doable for CopyTo 
-and 52Kb/s (0.53 mZ/s)* for CopyFrom
+around 15Kb/s (0.16 Z/s)* should be doable for CopyTo 
+and 52Kb/s (0.53 Z/s)* for CopyFrom
 
-*milli Zorks a second, where 1 ZORK=96K
+*Zorks a second, where 1 ZORK=96K
 
