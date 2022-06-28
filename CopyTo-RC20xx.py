@@ -27,6 +27,8 @@ args = parser.parse_args()
 
 debug=0
 bufsize=(3*1024) #needs to be divisable by 3 &4
+zork=96000
+totalsize=0
 
 serialport=args.port #.upper()
 if serialport=="": serialport="COM1"
@@ -121,8 +123,8 @@ while True:
     #send chunk size
     if debug :print("sending chunk ");
     WriteRead(str(len(message_bytes)))
-
-    print(".", end='');
+    totalsize+=len(message_bytes)
+    print(".", end='',flush=True);
     
     b64ls=base64.b64encode(message_bytes)
     if debug :print("send base64\n");
@@ -147,7 +149,9 @@ ser.close()             # close port
 
 
 print (filepath+" Sent")
-print("in ",end-start);
+bps=totalsize/(end-start)
+print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f mZ/s) " %(totalsize,end-start,bps,bps/zork))
+      
 
 
 

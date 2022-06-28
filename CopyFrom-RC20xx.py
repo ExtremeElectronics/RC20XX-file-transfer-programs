@@ -27,6 +27,9 @@ args = parser.parse_args()
 
 debug=0
 
+zork=96000
+totalsize=0
+
 serialport=args.port #.upper()
 if serialport=="": serialport="COM1"
 
@@ -138,9 +141,12 @@ if len(message_bytes)<2:
 localfile = open(filepath, "wb")
 localfile.write(message_bytes)
 localfile.close()
+totalsize=len(message_bytes)
 
 print (filepath+" Saved")
-
+bps=totalsize/(end-start)
+print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f mZ/s) " %(totalsize,end-start,bps,bps/zork))
+ 
 
 if debug: print("in ",end-start);
 
