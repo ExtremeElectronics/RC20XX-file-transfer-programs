@@ -15,7 +15,8 @@ def init_argparse() -> argparse.ArgumentParser:
         "-v", "--version", action="version",
         version = f"{parser.prog} version 1.0.0"
     )
-
+    parser.add_argument('-debug', help="Set Debug",action='store_true')
+    
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
     parser.add_argument('drive', help="CPM Drive on the Attached RC20XX")
     parser.add_argument('filepath', help="local CPM file and file to save on the Attached RC20XX")
@@ -25,8 +26,9 @@ def init_argparse() -> argparse.ArgumentParser:
 parser = init_argparse()
 args = parser.parse_args()
 
-debug=0
-bufsize=(3*1024) #needs to be divisable by 3 &4
+debug=args.debug
+
+bufsize=(12*1024) #needs to be divisable by 3 &4
 zork=96000
 totalsize=0
 
@@ -97,7 +99,6 @@ ser.flushOutput()
 ser.write((crlf+crlf).encode('utf_8'))
 time.sleep(0.1)
 ser.flushInput()
-time.sleep(0.1)
 
 start = time.time()
 
@@ -150,7 +151,7 @@ ser.close()             # close port
 
 print (filepath+" Sent")
 bps=totalsize/(end-start)
-print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f mZ/s) " %(totalsize,end-start,bps,bps/zork))
+print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f Z/s) " %(totalsize,end-start,bps,bps/zork))
       
 
 

@@ -14,17 +14,44 @@ def init_argparse() -> argparse.ArgumentParser:
         "-v", "--version", action="version",
         version = f"{parser.prog} version 1.0.0"
     )
-
+    parser.add_argument('-debug', help="Set Debug",action='store_true')
+    
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
     parser.add_argument('drive', help="CPM Drive on the Attached RC20XX")
     parser.add_argument('filename', help="CPM file on the Attached RC20XX")
     
+    
     return parser
+
+def WriteCrLf():
+    ser.write((crlf).encode('utf_8')) # write a string
+
+def ReadOnly(ExpectData,dbt):
+    if debug : print("Read ",dbt);
+    ReadText = ser.readline() # read a string
+    
+    if(ExpectData and len(ReadText)==0):
+      print ("Read only Timeout ")
+      ser.close()             # close port
+      sys.exit(1)
+      
+    if debug : print(ReadText.decode('ascii','ignore')) 
+    return ReadText
+
+
+def WriteRead(text,ExpectData,dbt):
+    if debug : print("Write ",dbt);
+    ser.flushInput()
+    ser.write((text+crlf).encode('utf_8')) # write a string
+ 
+    return ReadOnly(ExpectData," Read AfterWrite")
+
+
 
 parser = init_argparse()
 args = parser.parse_args()
 
-debug=0
+debug=args.debug
 
 serialport=args.port #.upper()
 if serialport=="": serialport="COM1"
@@ -48,57 +75,30 @@ StartToken = "&&&-magic-XXX"
 EndToken = "XXX-magic-&&&"
 crlf='\n';
 
-def WriteRead(text):
-    ser.write((text+crlf).encode('utf_8')) # write a string
-    #ser.flushOutput()
-    time.sleep(0.1)
-    try:
-      ReadText = ser.readline() # read a string
-    except serial.SerialTimeoutException:
-      print ("Timeout")
-      ser.close()             # close port
-      sys.exit(1)
-      
-    if debug : print(ReadText.decode("ascii",'ignore')) 
-    return ReadText
-
-def ReadOnly():
-    try:
-      ReadText = ser.readline() # read a string
-    except serial.SerialTimeoutException:
-      print ("Timeout")
-      ser.close()             # close port
-      sys.exit(1)
-      
-    if debug : print(ReadText.decode('ascii','ignore')) 
-    return ReadText
-
-
 sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser,1),newline = '\n',line_buffering = True)              
     
 ser.flushOutput()
 ser.write((crlf+crlf).encode('utf_8'))
 time.sleep(0.1)
 ser.flushInput()
-time.sleep(0.1)
+
 
 print("fetching ",filename);
 
-WriteRead(StartToken)
-WriteRead("COPYFROM")
-WriteRead(drive)
+WriteRead(StartToken,True,"Start")
+WriteRead("COPYFROM",True,"CopyFrom")
+WriteRead(drive,True,"Drive")
 
 if debug :print("wait for OK");
-if b"OK" not in WriteRead(filename): #read OK
+if b"OK" not in WriteRead(filename,True,"FileName"): #read OK
    print ("No OK returned")
    sys.exit(1)
    
-if debug :print("wait for filename");
-ReadOnly() #read filename
-ReadOnly()
-if debug :print("wait for base64");
-b64ls=ReadOnly()
-if debug :print(b64ls)
+
+ReadOnly(True,"filename") #read filename
+ReadOnly(False,"After Filename")
+
+b64ls=ReadOnly(True,"b64")
 b64ls=b64ls.replace(b'\r',b'')
 b64ls=b64ls.replace(b'\n',b'')
 

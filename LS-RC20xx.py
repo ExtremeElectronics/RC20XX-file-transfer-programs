@@ -14,15 +14,43 @@ def init_argparse() -> argparse.ArgumentParser:
         "-v", "--version", action="version",
         version = f"{parser.prog} version 1.0.0"
     )
-
+    parser.add_argument('-debug', help="Set Debug",action='store_true')
+    
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
     parser.add_argument('drive', help="CPM Drive on the Attached RC20XX")
     return parser
 
+def WriteCrLf():
+    ser.write((crlf).encode('utf_8')) # write a string
+
+def ReadOnly(ExpectData,dbt):
+    if debug : print("Read ",dbt);
+    ReadText = ser.readline() # read a string
+    
+    if(ExpectData and len(ReadText)==0):
+      print ("Read only Timeout ")
+      ser.close()             # close port
+      sys.exit(1)
+      
+    if debug : print(ReadText.decode('ascii','ignore')) 
+    return ReadText
+
+
+def WriteRead(text,ExpectData,dbt):
+    if debug : print("Write ",dbt);
+    ser.flushInput()
+    ser.write((text+crlf).encode('utf_8')) # write a string
+    
+    return ReadOnly(ExpectData," Read AfterWrite")
+
+
+
+
 parser = init_argparse()
 args = parser.parse_args()
 
-debug=0
+debug=args.debug
+
 serialport=args.port.upper()
 if serialport=="": serialport="COM1"
 drive=args.drive.upper()
@@ -40,31 +68,6 @@ StartToken = "&&&-magic-XXX"
 EndToken = "XXX-magic-&&&"
 crlf='\n';
 
-def WriteRead(text):
-    ser.write((text+crlf).encode('utf_8')) # write a string
-    #ser.flushOutput()
-    time.sleep(0.1)
-    try:
-      ReadText = ser.readline() # read a string
-    except serial.SerialTimeoutException:
-      print ("Timeout")
-      ser.close()             # close port
-      sys.exit(1)
-      
-    if debug : print(ReadText.decode("ascii",'ignore')) 
-    return ReadText
-
-def ReadOnly():
-    try:
-      ReadText = ser.readline() # read a string
-    except serial.SerialTimeoutException:
-      print ("Timeout")
-      ser.close()             # close port
-      sys.exit(1)
-      
-    if debug : print(ReadText.decode('ascii','ignore')) 
-    return ReadText
-
 
 
 #ser = serial.serial_for_url('loop://', timeout=1)
@@ -76,11 +79,17 @@ time.sleep(0.1)
 ser.flushInput()
 time.sleep(0.1)
 
-WriteRead(StartToken)
-WriteRead("LS")
-WriteRead(drive)
-ReadOnly() #read /n
-b64ls=ReadOnly()
+WriteCrLf()
+WriteRead(StartToken,True,"StartTok")
+WriteRead("LS",True,"LS")
+
+if b"OK" not in WriteRead(drive,True,"Drive"):
+   print ("No OK returned")
+   ser.close()
+   sys.exit(1)
+   
+WriteRead("",False,"OK")   
+b64ls=ReadOnly(True,"b64")
 b64ls=b64ls.replace(b'\r',b'')
 b64ls=b64ls.replace(b'\n',b'')
 

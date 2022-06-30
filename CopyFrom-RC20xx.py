@@ -15,6 +15,8 @@ def init_argparse() -> argparse.ArgumentParser:
         "-v", "--version", action="version",
         version = f"{parser.prog} version 1.0.0"
     )
+    parser.add_argument('-debug', help="Set Debug",action='store_true')
+    
 
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
     parser.add_argument('drive', help="CPM Drive on the Attached RC20XX")
@@ -25,7 +27,7 @@ def init_argparse() -> argparse.ArgumentParser:
 parser = init_argparse()
 args = parser.parse_args()
 
-debug=0
+debug=args.debug
 
 zork=96000
 totalsize=0
@@ -64,30 +66,27 @@ StartToken = "&&&-magic-XXX"
 EndToken = "XXX-magic-&&&"
 crlf='\n';
 
-def WriteRead(text):
-    ser.write((text+crlf).encode('utf_8')) # write a string
-    #ser.flushOutput()
-    time.sleep(0.1)
-    try:
-      ReadText = ser.readline() # read a string
-    except serial.SerialTimeoutException:
-      print ("Timeout")
-      ser.close()             # close port
-      sys.exit(1)
-      
-    if debug : print(ReadText.decode("ascii",'ignore')) 
-    return ReadText
+def WriteCrLf():
+    ser.write((crlf).encode('utf_8')) # write a string
 
-def ReadOnly():
-    try:
-      ReadText = ser.readline() # read a string
-    except serial.SerialTimeoutException:
-      print ("Timeout")
+def ReadOnly(ExpectData,dbt):
+    if debug : print("Read ",dbt);
+    ReadText = ser.readline() # read a string
+    
+    if(ExpectData and len(ReadText)==0):
+      print ("Read only Timeout ")
       ser.close()             # close port
       sys.exit(1)
       
     if debug : print(ReadText.decode('ascii','ignore')) 
     return ReadText
+
+def WriteRead(text,ExpectData,dbt):
+    if debug : print("Write ",dbt);
+    ser.flushInput()
+    ser.write((text+crlf).encode('utf_8')) # write a string
+    
+    return ReadOnly(ExpectData," Read AfterWrite")
 
 
 sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser,1),newline = '\n',line_buffering = True)              
@@ -96,27 +95,26 @@ ser.flushOutput()
 ser.write((crlf+crlf).encode('utf_8'))
 time.sleep(0.1)
 ser.flushInput()
-time.sleep(0.1)
 
 start = time.time()
 
 print("fetching ",filename);
 
-WriteRead(StartToken)
-WriteRead("COPYFROM")
-WriteRead(drive)
+WriteRead(StartToken,True,"Start")
+WriteRead("COPYFROM",True,"CopyFrom")
+WriteRead(drive,True,"Drive")
 
 if debug :print("wait for OK");
-if b"OK" not in WriteRead(filename): #read OK
+if b"OK" not in WriteRead(filename,True,"Filename"): #read OK
    print ("No OK returned")
    ser.close() 
    sys.exit(1)
    
 if debug :print("wait for filename");
-ReadOnly() #read filename
-ReadOnly()
+ReadOnly(False,"Fn1") #read filename
+ReadOnly(False,"Fn2")
 if debug :print("wait for base64");
-b64ls=ReadOnly()
+b64ls=ReadOnly(True,"B64")
 if debug :print(b64ls)
 b64ls=b64ls.replace(b'\r',b'')
 b64ls=b64ls.replace(b'\n',b'')
@@ -145,7 +143,7 @@ totalsize=len(message_bytes)
 
 print (filepath+" Saved")
 bps=totalsize/(end-start)
-print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f mZ/s) " %(totalsize,end-start,bps,bps/zork))
+print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f Z/s) " %(totalsize,end-start,bps,bps/zork))
  
 
 if debug: print("in ",end-start);
