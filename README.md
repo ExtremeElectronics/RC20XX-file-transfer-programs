@@ -1,7 +1,9 @@
 # RC20XX-file-transfer-programs
 Python programs to transfer CPM files to/from PC to RC2040 and RC2014 with an XK SD card interface.
 
-Transfer / delete/ list files via the serial port (or usb serial port) 
+Transfer / delete/ list / cat files via the serial port (or usb serial port) 
+
+## Your RC20xx needs to reliably boot into and run CP/M before trying to use these tools
 
 The port needs to be the COM port connected to the RC20xx, the program needs exclusive access to this port, no other serial program must be running
 On Windows machines the com port will be of the form COMxx 
