@@ -51,7 +51,7 @@ args = parser.parse_args()
 
 debug=args.debug
 
-serialport=args.port.upper()
+serialport=args.port #.upper()
 if serialport=="": serialport="COM1"
 drive=args.drive.upper()
 if drive=="": drive="A"
