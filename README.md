@@ -52,3 +52,9 @@ and 52Kb/s (0.53 Z/s)* for CopyFrom
 
 *Zorks a second, where 1 ZORK=96K
 
+## DISKDEF WARNING ##
+The diskdefs file must have lines terminated in LF ONLY, don't copy/paste the file into an editor then save, it may change them to CRLF's
+
+Download and Save as RAW
+
+
