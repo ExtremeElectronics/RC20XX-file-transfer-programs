@@ -28,11 +28,12 @@ args = parser.parse_args()
 
 debug=args.debug
 
-bufsize=(12*1024) #needs to be divisable by 3 &4
+bufsize=(*1024) #needs to be EXACTLY 4096  else cpmWrite fails
+
 zork=96000
 totalsize=0
 
-serialport=args.port #.upper()
+serialport=args.port 
 if serialport=="": serialport="COM1"
 
 drive=args.drive.upper()
@@ -46,10 +47,10 @@ if filename=="":sys.exit(1)
 if len(filename)>12:sys.exit(1)
 
 try:
-  ser = serial.Serial(serialport, 115200, timeout=5)  # open serial port
-except:
-  print ("Can't open serial port ",serialport)
-  sys.exit(1)
+    ser = serial.Serial(serialport, 115200, timeout=5)  # open serial port
+except serial.SerialException as e:
+    print ("Cant open serial port ",serialport,e)
+    sys.exit(1)
   
 if debug : print(ser.name)         # check which port was really used
 

@@ -28,11 +28,11 @@ serialport=args.port #.upper()
 if serialport=="": serialport="COM1"
 
 try:
-  ser = serial.Serial(serialport, 115200, timeout=5)  # open serial port
-except:
-  print ("Cant open serial port ",serialport)
-  sys.exit(1)
-  
+    ser = serial.Serial(serialport, 115200, timeout=5)  # open serial port
+except serial.SerialException as e:
+    print ("Cant open serial port ",serialport,e)
+    sys.exit(1)
+    
 if debug : print(ser.name)         # check which port was really used
 
 StartToken = "EXIT"
