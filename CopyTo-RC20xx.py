@@ -28,7 +28,7 @@ args = parser.parse_args()
 
 debug=args.debug
 
-bufsize=(*1024) #needs to be EXACTLY 4096  else cpmWrite fails
+bufsize=(4*1024) #needs to be EXACTLY 4096  else cpmWrite fails
 
 zork=96000
 totalsize=0
