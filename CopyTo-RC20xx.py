@@ -5,11 +5,15 @@ import base64
 import sys
 import argparse
 import os.path
+import RCxxSerial
+
+StartToken = "&&&-magic-XXX"
+Speed=115200
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         usage="%(prog)s [PORT] [DRIVE] [filepath]...",
-        description="List CPM Directory on RC20XX."
+        description="Copy file to CPM Drive on RC20XX."
     )
     parser.add_argument(
         "-v", "--version", action="version",
@@ -27,6 +31,7 @@ parser = init_argparse()
 args = parser.parse_args()
 
 debug=args.debug
+RCxxSerial.debug=debug
 
 bufsize=(4*1024) #needs to be EXACTLY 4096  else cpmWrite fails
 
@@ -46,109 +51,83 @@ if debug: print(filepath,filename)
 if filename=="":sys.exit(1)
 if len(filename)>12:sys.exit(1)
 
-try:
-    ser = serial.Serial(serialport, 115200, timeout=5)  # open serial port
-except serial.SerialException as e:
-    print ("Cant open serial port ",serialport,e)
-    sys.exit(1)
-  
-if debug : print(ser.name)         # check which port was really used
+#Open Serial Port
+ser=RCxxSerial.OpenSerial(serialport,Speed)
 
-StartToken = "&&&-magic-XXX"
-EndToken = "XXX-magic-&&&"
-crlf='\n';
+#Flush buffers
+RCxxSerial.InitSerial(ser)
+#send initial string
+RCxxSerial.WriteRead(ser,StartToken,"StartTok")
+#send command
+RCxxSerial.WriteRead(ser,"COPYTO","COPYTO")
+#send drive
+RCxxSerial.WriteRead(ser,drive,"Drive")
 
-
-def WriteRead(text,b=0):
-    if debug : print(">",text)
-    ser.flushInput()
-    if(b==0):
-      ser.write((text+crlf).encode('utf_8')) # write a string
-    else:
-      ser.write(text+crlf.encode('utf_8')) # write a string  
-    
-    time.sleep(0.1)
-   
-    ReadText = ser.readline() # read a string
-    if(len(ReadText)==0):
-      print ("Timeout")
-      ser.close()             # close port
-      sys.exit(1)
-      
-    if debug : print("<",ReadText.decode("ascii",'ignore')) 
-    return ReadText
-
-def ReadOnly():
-    ser.flushInput()
-    if debug : print("RD")
-    ReadText = ser.readline() # read a string
-    if(len(ReadText)==0):
-      print ("Timeout")
-      ser.close()             # close port
-      sys.exit(1)
-      
-    if debug : print("<",ReadText.decode('ascii','ignore')) 
-    return ReadText
-
-if not os.path.exists(filepath):
-    print(filepath, "does not exist in this directory")
-    sys.exit(1)
-
-sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser,1),newline = '\n',line_buffering = True)              
-    
-ser.flushOutput()
-ser.write((crlf+crlf).encode('utf_8'))
-time.sleep(0.1)
-ser.flushInput()
-
+#Time the transfer
 start = time.time()
 
-print("sending ",filename);
-
-WriteRead(StartToken)
-WriteRead("COPYTO")
-WriteRead(drive)
-
-
-if b"OK" not in WriteRead(filename) :#read OK
-   print ("No OK returned")
-   ser.close() 
-   sys.exit(1)
+#send filename and wait for OK
+if b"OK" not in RCxxSerial.WriteRead(ser,filename,"Wait for OK") :#read OK
+    print ("No OK returned")
+    RCxxSerial.Close(ser) 
+    sys.exit(1)
    
 localfile = open(filepath, "rb")
 while True:
     message_bytes = localfile.read(bufsize)
     if not message_bytes:
-        if debug :print("EOM");
-        break
+         if debug :print("EOM");
+         break
     
+    #txt=RCxxSerial.WriteRead(ser,"","Wait for OK:")
+    #if b"OK" not in txt:
+    #     print(" Not Rceived OK: ", txt)
+    #     RCxxSerial.Close(ser)
+    #     sys.exit(1)
+    
+    txt=RCxxSerial.ReadOnly(ser,"Wait for ChunkSize:")
+    #txt=RCxxSerial.WriteRead(ser,"","Wait for ChunkSize:")
+    if b"Chunk" not in txt:
+         print(" Not Rceived Chunksize: ", txt)
+         RCxxSerial.Close(ser)
+         sys.exit(1)
+   
     #send chunk size
-    if debug :print("sending chunk ");
-    WriteRead(str(len(message_bytes)))
+    if debug :print("sending chunk ",str(len(message_bytes)) )
+    txt=RCxxSerial.WriteRead(ser,str(len(message_bytes)),"Chunk")
+    if b"Data" not in txt:
+         print(" Not Rceived Data: ", txt)
+         RCxxSerial.Close(ser)
+         sys.exit(1)
+         
     totalsize+=len(message_bytes)
-    print(".", end='',flush=True);
+    print(".", end='',flush=True)
     
     b64ls=base64.b64encode(message_bytes)
-    if debug :print("send base64\n");
-    if b"OK" not in WriteRead(b64ls,1):
-        print(" failed to acknoledge last packet")
-        break
-    
+    if debug :print("send base64\n")
+    txt=RCxxSerial.WriteRead(ser,b64ls,"b64",1)
+    if b"OK" not in txt:
+         print(" Not Received OK ", txt)
+         RCxxSerial.Close(ser)
+         sys.exit(1)
+      
+time.sleep(0.1)   
+   
 localfile.close()
 print("")
 
 #send zero chunk
-if debug :print("send zero CS");
+if debug :print("send zero Chunk");
+
 #ReadOnly()
-if b"OK" not in WriteRead("0"):
-   print ("No OK returned")
-   ser.close() 
-   sys.exit(1)
+txt=RCxxSerial.WriteRead(ser,"0","0")
+if b"OK" not in txt :
+    print ("No OK returned on last chunk ",txt)
+    RCxxSerial.Close(ser) 
+    sys.exit(1)
    
 end = time.time()
-ser.close()             # close port
-
-
+RCxxSerial.Close(ser)           # close port
 
 print (filepath+" Sent")
 bps=totalsize/(end-start)

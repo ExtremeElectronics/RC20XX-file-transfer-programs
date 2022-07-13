@@ -4,6 +4,10 @@ import time
 import base64
 import sys
 import argparse
+import RCxxSerial
+
+StartToken = "&&&-magic-XXX"
+Speed=115200
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -18,7 +22,7 @@ def init_argparse() -> argparse.ArgumentParser:
 
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
     parser.add_argument('drive', help="CPM Drive on the Attached RC20XX")
-    parser.add_argument('filename', help="local CPM file and file to save on the Attached RC20XX")
+    parser.add_argument('filename', help=" CPM file to delete on the Attached RC20XX")
     
     return parser
 
@@ -26,6 +30,10 @@ parser = init_argparse()
 args = parser.parse_args()
 
 debug=args.debug
+RCxxSerial.debug=debug
+
+
+
 serialport=args.port #.upper()
 if serialport=="": serialport="COM1"
 drive=args.drive.upper()
@@ -33,63 +41,33 @@ if drive=="": drive="A"
 
 filename=args.filename
 
-try:
-  ser = serial.Serial(serialport, 115200, timeout=5)  # open serial port
-except:
-  print ("Can't open serial port ",serialport)
-  sys.exit(1)
-  
-if debug : print(ser.name)         # check which port was really used
-
-StartToken = "&&&-magic-XXX"
-EndToken = "XXX-magic-&&&"
-crlf='\n';
-
-
-def WriteCrLf():
-    ser.write((crlf).encode('utf_8')) # write a string
-
-def ReadOnly(ExpectData,dbt):
-    if debug : print("Read ",dbt);
-    ReadText = ser.readline() # read a string
+if filename=="":
+    print ("Filename can't be empty")
+    sys.exit(1)
     
-    if(ExpectData and len(ReadText)==0):
-      print ("Read only Timeout ")
-      ser.close()             # close port
-      sys.exit(1)
-      
-    if debug : print(ReadText.decode('ascii','ignore')) 
-    return ReadText
-
-
-def WriteRead(text,ExpectData,dbt):
-    if debug : print("Write ",dbt);
-    ser.flushInput()
-    ser.write((text+crlf).encode('utf_8')) # write a string
- 
-    return ReadOnly(ExpectData," Read AfterWrite")
-
-
-#ser = serial.serial_for_url('loop://', timeout=1)
-sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser,1),newline = '\n',line_buffering = True)              
+if len(filename)>12:
+    print ("Filename must be 8.3 formatted")
+    sys.exit(1)
     
-ser.flushOutput()
-ser.write((crlf+crlf).encode('utf_8'))
-time.sleep(0.1)
-ser.flushInput()
+#Open Serial Port
+ser=RCxxSerial.OpenSerial(serialport,Speed)
 
-WriteRead(StartToken,True,"Start")
-WriteRead("RM",True,"RM")
-WriteRead(drive,True,"Drive")
+#Flush buffers
+RCxxSerial.InitSerial(ser)
 
-if b"OK" not in WriteRead(filename,True,"OK") :#read OK
-   print ("No OK returned")
-   ser.close()
+RCxxSerial.WriteRead(ser,StartToken,"Start")
+RCxxSerial.WriteRead(ser,"RM","RM")
+RCxxSerial.WriteRead(ser,drive,"Drive")
+
+txt=RCxxSerial.WriteRead(ser,filename,"OK")
+if b"OK" not in txt :#read OK
+   print ("No OK returned ",txt)
+   RCxxSerial.Close(ser)
    sys.exit(1)
    
 
 
-ser.close()             # close port
+RCxxSerial.Close(ser)            # close port
 
 print ("Removed",filename)
 #WriteRead(EndToken)

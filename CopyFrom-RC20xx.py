@@ -5,11 +5,15 @@ import base64
 import sys
 import argparse
 import os
+import RCxxSerial
+
+StartToken = "&&&-magic-XXX"
+Speed=115200
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         usage="%(prog)s [PORT] [DRIVE] [filepath] ...",
-        description="List CPM Directory on RC20XX."
+        description="Copy file from CPM Drive on RC20XX."
     )
     parser.add_argument(
         "-v", "--version", action="version",
@@ -20,7 +24,7 @@ def init_argparse() -> argparse.ArgumentParser:
 
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
     parser.add_argument('drive', help="CPM Drive on the Attached RC20XX")
-    parser.add_argument('filepath', help="CPM file on the Attached RC20XX")
+    parser.add_argument('filepath', help="local file path to save the file to")
     
     return parser
 
@@ -28,6 +32,7 @@ parser = init_argparse()
 args = parser.parse_args()
 
 debug=args.debug
+RCxxSerial.debug=debug
 
 zork=96000
 totalsize=0
@@ -51,73 +56,44 @@ if len(filename)>12:
     print ("Filename must be 8.3 formatted")
     sys.exit(1)
 
-try:
-    ser = serial.Serial(serialport, 115200, timeout=5)  # open serial port
-except serial.SerialException as e:
-    print ("Cant open serial port ",serialport,e)
-    sys.exit(1)
-    
-if debug : print(ser.name)         # check which port was really used
+#Open Serial Port
+ser=RCxxSerial.OpenSerial(serialport,Speed)
 
-StartToken = "&&&-magic-XXX"
-EndToken = "XXX-magic-&&&"
-crlf='\n';
+#Flush buffers
+RCxxSerial.InitSerial(ser)
+#send initial string
+RCxxSerial.WriteRead(ser,StartToken,"StartTok")
+#send command
+RCxxSerial.WriteRead(ser,"COPYFROM","COPYFROM")
+#send drive
+RCxxSerial.WriteRead(ser,drive,"Drive")
 
-def WriteCrLf():
-    ser.write((crlf).encode('utf_8')) # write a string
-
-def ReadOnly(ExpectData,dbt):
-    if debug : print("Read ",dbt);
-    ReadText = ser.readline() # read a string
-    
-    if(ExpectData and len(ReadText)==0):
-      print ("Read only Timeout ")
-      ser.close()             # close port
-      sys.exit(1)
-      
-    if debug : print(ReadText.decode('ascii','ignore')) 
-    return ReadText
-
-def WriteRead(text,ExpectData,dbt):
-    if debug : print("Write ",dbt);
-    ser.flushInput()
-    ser.write((text+crlf).encode('utf_8')) # write a string
-    
-    return ReadOnly(ExpectData," Read AfterWrite")
-
-
-sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser,1),newline = '\n',line_buffering = True)              
-    
-ser.flushOutput()
-ser.write((crlf+crlf).encode('utf_8'))
-time.sleep(0.1)
-ser.flushInput()
 
 start = time.time()
 
 print("fetching ",filename);
 
-WriteRead(StartToken,True,"Start")
-WriteRead("COPYFROM",True,"CopyFrom")
-WriteRead(drive,True,"Drive")
+#WriteRead(StartToken,True,"Start")
+#WriteRead("COPYFROM",True,"CopyFrom")
+#WriteRead(drive,True,"Drive")
 
 if debug :print("wait for OK");
-if b"OK" not in WriteRead(filename,True,"Filename"): #read OK
+if b"OK" not in RCxxSerial.WriteRead(ser,filename,"Filename"): #read OK
    print ("No OK returned")
-   ser.close() 
+   RCxxSerial.Close(ser) 
    sys.exit(1)
    
 if debug :print("wait for filename");
-ReadOnly(False,"Fn1") #read filename
-ReadOnly(False,"Fn2")
+RCxxSerial.ReadOnly(ser,"Fn1") #read filename
+RCxxSerial.ReadOnly(ser,"Fn2")
 if debug :print("wait for base64");
-b64ls=ReadOnly(True,"B64")
+b64ls=RCxxSerial.ReadOnly(ser,"B64")
 if debug :print(b64ls)
 b64ls=b64ls.replace(b'\r',b'')
 b64ls=b64ls.replace(b'\n',b'')
 
 
-ser.close()             # close port
+RCxxSerial.Close(ser)              # close port
 if debug :print("b64",b64ls)
 
 try:
