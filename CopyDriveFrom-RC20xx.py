@@ -13,7 +13,7 @@ Speed=115200
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         usage="%(prog)s [PORT] [DRIVE] ...",
-        description="List CPM Drive on RC20XX."
+        description="copy CPM Drive on RC20XX to local directory."
     )
     parser.add_argument(
         "-v", "--version", action="version",
@@ -23,7 +23,8 @@ def init_argparse() -> argparse.ArgumentParser:
     
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
     parser.add_argument('drive', help="CPM Drive on the Attached RC20XX")
-   
+    parser.add_argument('directory', help="Local Directory to save files into")
+    
     return parser
 
 def DoExec(cmd):
@@ -43,6 +44,11 @@ if serialport=="": serialport="COM1"
 
 drive=args.drive.upper()
 if drive=="": drive="A"
+
+path=args.directory
+if not os.path.isdir(path):
+  print ("Path does not exist")
+  sys.exit(1)
 
 #Open Serial Port
 ser=RCxxSerial.OpenSerial(serialport,Speed)
@@ -78,6 +84,30 @@ except:
   sys.exit(1)
   
 #print it  
-print ("Drive ",drive)
+#print ("Drive  D",drive)
 directory=message_bytes.decode('utf_8')
-print(directory)
+#print(directory)
+
+lines=directory.split("\n")
+filenames=[]
+for line in lines:
+  a1=line.split(".")
+  if len(a1)>1:
+    #print(a1[1])
+    a2=a1[1].split(" ")
+    #print(a2)
+    filename=a1[0].strip()+"."+a2[0]
+    #print (filename)
+    if len(filename)<=13:
+      filenames.append(filename)
+      
+db=" "
+if debug:db=" -d "
+    
+for file in filenames:
+    print(path,file)  
+    pathfile=os.path.join(path,file)
+    cmd="python CopyFrom-RC20xx.py " + serialport + db + drive + " " + pathfile
+    DoExec(cmd ) 
+    time.sleep(0.1)    
+
