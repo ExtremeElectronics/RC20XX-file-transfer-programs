@@ -1,6 +1,7 @@
 import os
 import time
 import argparse
+import sys
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -19,6 +20,13 @@ def init_argparse() -> argparse.ArgumentParser:
     
     return parser
 
+def DoExec(cmd):
+    stream = os.popen(cmd)
+    output = stream.read()
+    if debug:print(cmd)
+    print(output)
+
+
 parser = init_argparse()
 args = parser.parse_args()
 
@@ -36,19 +44,15 @@ path=args.path
 if debug: print(path)
 
 
-def DoExec(cmd):
-    stream = os.popen(cmd)
-    output = stream.read()
-    print(cmd)
-    print(output)
 
 db=" "
 if debug:db=" -d "
 
 for file in os.listdir(path):
   pathfile=os.path.join(path, file)
+  pythonpath=sys.executable
   if os.path.isfile(pathfile):
-    cmd="python CopyTo-RC20xx.py " + serialport + db + drive + " " + pathfile
+    cmd=pythonpath+" CopyTo-RC20xx.py " + serialport + db + drive + " " + pathfile
     DoExec(cmd ) 
     time.sleep(0.1)
   

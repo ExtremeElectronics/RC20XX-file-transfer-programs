@@ -30,7 +30,7 @@ def init_argparse() -> argparse.ArgumentParser:
 def DoExec(cmd):
     stream = os.popen(cmd)
     output = stream.read()
-    print(cmd)
+    if debug:print(cmd)
     print(output)
 
 #Get Command line
@@ -107,7 +107,8 @@ if debug:db=" -d "
 for file in filenames:
     print(path,file)  
     pathfile=os.path.join(path,file)
-    cmd="python CopyFrom-RC20xx.py " + serialport + db + drive + " " + pathfile
+     pythonpath=sys.executable
+    cmd=pythonpath +" CopyFrom-RC20xx.py " + serialport + db + drive + " " + pathfile
     DoExec(cmd ) 
     time.sleep(0.1)    
 
