@@ -47,8 +47,8 @@ if drive=="": drive="A"
 
 path=args.directory
 if not os.path.isdir(path):
-  print ("Path does not exist")
-  sys.exit(1)
+    print ("Path does not exist")
+    sys.exit(1)
 
 #Open Serial Port
 ser=RCxxSerial.OpenSerial(serialport,Speed)
@@ -62,9 +62,9 @@ RCxxSerial.WriteRead(ser,StartToken,"StartTok")
 RCxxSerial.WriteRead(ser,"LS","LS")
 #send drive and wait for OK
 if b"OK" not in RCxxSerial.WriteRead(ser,drive,"Drive"):
-   print ("No OK returned")
-   RCxxSerial.Close(ser)  
-   sys.exit(1)
+    print ("No OK returned")
+    RCxxSerial.Close(ser)  
+    sys.exit(1)
    
 RCxxSerial.WriteRead(ser,"","After OK")   
 #receive data
@@ -78,10 +78,10 @@ if debug :print("b64",b64ls)
 
 #decode message
 try:
-  message_bytes = base64.b64decode(b64ls)
+    message_bytes = base64.b64decode(b64ls)
 except:
-  print("decode failed ",b64ls)
-  sys.exit(1)
+    print("decode failed ",b64ls)
+    sys.exit(1)
   
 #print it  
 #print ("Drive  D",drive)
@@ -91,15 +91,15 @@ directory=message_bytes.decode('utf_8')
 lines=directory.split("\n")
 filenames=[]
 for line in lines:
-  a1=line.split(".")
-  if len(a1)>1:
-    #print(a1[1])
-    a2=a1[1].split(" ")
-    #print(a2)
-    filename=a1[0].strip()+"."+a2[0]
-    #print (filename)
-    if len(filename)<=13:
-      filenames.append(filename)
+    a1=line.split(".")
+    if len(a1)>1:
+        #print(a1[1])
+        a2=a1[1].split(" ")
+        #print(a2)
+        filename=a1[0].strip()+"."+a2[0]
+        #print (filename)
+        if len(filename)<=13:
+            filenames.append(filename)
       
 db=" "
 if debug:db=" -d "
@@ -107,7 +107,7 @@ if debug:db=" -d "
 for file in filenames:
     print(path,file)  
     pathfile=os.path.join(path,file)
-     pythonpath=sys.executable
+    pythonpath=sys.executable
     cmd=pythonpath +" CopyFrom-RC20xx.py " + serialport + db + drive + " " + pathfile
     DoExec(cmd ) 
     time.sleep(0.1)    

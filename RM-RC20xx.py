@@ -55,7 +55,7 @@ ser=RCxxSerial.OpenSerial(serialport,Speed)
 #Flush buffers
 RCxxSerial.InitSerial(ser)
 
-RCxxSerial.WriteRead(ser,StartToken,"Start")
+RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
 RCxxSerial.WriteRead(ser,"RM","RM")
 RCxxSerial.WriteRead(ser,drive,"Drive")
 

@@ -51,7 +51,7 @@ ser=RCxxSerial.OpenSerial(serialport,Speed)
 RCxxSerial.InitSerial(ser)
 
 #send initial string
-RCxxSerial.WriteRead(ser,StartToken,"StartTok")
+RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
 #send command
 RCxxSerial.WriteRead(ser,"LS","LS")
 #send drive and wait for OK

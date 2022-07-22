@@ -62,7 +62,7 @@ ser=RCxxSerial.OpenSerial(serialport,Speed)
 #Flush buffers
 RCxxSerial.InitSerial(ser)
 #send initial string
-RCxxSerial.WriteRead(ser,StartToken,"StartTok")
+RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
 #send command
 RCxxSerial.WriteRead(ser,"COPYFROM","COPYFROM")
 #send drive
