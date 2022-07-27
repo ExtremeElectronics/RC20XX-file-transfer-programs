@@ -45,6 +45,14 @@ Arguments of COM port and CPM Drive letter required
 Sends a code to release the RC2040 from serial file mode. (not needed on the RC2014)
 Argument, needs com port only 
 
+## ffsexplorer.py
+A GUI to try to tie everything together. 
+Connect by selecting a com port 
+Select the drive with the CPM Dive dropdown
+Drop files to the black and green directory display to upload files to your RC20xx
+Select files in the directory display, to Erase, or Copy slected files to download to a directory on your computer.
+Disconnect to detach from the com port (and exit from file transfer on an RC2040) 
+
 ## Speed
 CopyTo and CopyFrom give an idea of transfer speed. 
 around 15Kb/s (0.16 Z/s)* should be doable for CopyTo 
