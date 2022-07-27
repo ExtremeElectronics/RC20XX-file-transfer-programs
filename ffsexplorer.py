@@ -40,9 +40,11 @@ root.grid_columnconfigure(2, weight=20)
 root.grid_rowconfigure(9, weight=3)
 
 drivescrollbar = Scrollbar(root)
+dirfilenames=[]
+
 
 def driveChange(cpmdrive):
-    
+    global dirfilenames
     # Get all Files  from the given CPMDirectory
     #cpmdrive = os.listdir(currentPath.get())
     # Clearing the list
@@ -60,8 +62,8 @@ def driveChange(cpmdrive):
         print("decode failed ",b64ls)
         sys.exit(1)
     directory=message_bytes.decode('utf_8')
-    filenames=RCxxSerial.DirectoryToFilenames(directory)
-    for i,fn in enumerate(filenames):
+    dirfilenames=RCxxSerial.DirectoryToFilenames(directory)
+    for i,fn in enumerate(dirfilenames):
         list2.insert(i,fn)
 
     #remove selection
@@ -82,47 +84,47 @@ def driveSelect(cd):
 #    for file in directory:
 #        list1.insert(0, file)
 
-def changePathByClick(event=None):
-    # Get clicked item.
-    picked = list1.get(list.curselection()[0])
-    # get the complete path by joining the current path with the picked item
-    path = os.path.join(currentPath.get(), picked)
-    # Check if item is file, then open it
-    if os.path.isfile(path):
-        print('Opening: '+path)
-        os.startfile(path)
-    # Set new path, will trigger pathChange function.
-    else:
-        currentPath.set(path)
+#def changePathByClick(event=None):
+#    # Get clicked item.
+#    picked = list1.get(list.curselection()[0])
+#    # get the complete path by joining the current path with the picked item
+#    path = os.path.join(currentPath.get(), picked)
+#    # Check if item is file, then open it
+#    if os.path.isfile(path):
+#        print('Opening: '+path)
+#        os.startfile(path)
+#    # Set new path, will trigger pathChange function.
+#    else:
+#        currentPath.set(path)
 
-def goBack(event=None):
-    # get the new path
-    newPath = pathlib.Path(currentPath.get()).parent
-    # set it to currentPath
-    currentPath.set(newPath)
-    # simple message
-    print('Going Back')
+#def goBack(event=None):
+#    # get the new path
+#    newPath = pathlib.Path(currentPath.get()).parent
+#    # set it to currentPath
+#    currentPath.set(newPath)
+#    # simple message
+#    print('Going Back')
 
-def open_popup():
-    global top
-    top = Toplevel(root)
-    top.geometry("250x150")
-    top.resizable(False, False)
-    top.title("Child Window")
-    top.columnconfigure(0, weight=1)
-    Label(top, text='Enter File or Folder name').grid()
-    Entry(top, textvariable=newFileName).grid(column=0, pady=10, sticky='NSEW')
-    Button(top, text="Create", command=newFileOrFolder).grid(pady=10, sticky='NSEW')
+#def open_popup():
+#    global top
+#    top = Toplevel(root)
+#    top.geometry("250x150")
+#    top.resizable(False, False)
+#    top.title("Child Window")
+#    top.columnconfigure(0, weight=1)
+#    Label(top, text='Enter File or Folder name').grid()
+#    Entry(top, textvariable=newFileName).grid(column=0, pady=10, sticky='NSEW')
+#    Button(top, text="Create", command=newFileOrFolder).grid(pady=10, sticky='NSEW')
 
-def newFileOrFolder():
-    # check if it is a file name or a folder
-    if len(newFileName.get().split('.')) != 1:
-        open(os.path.join(currentPath.get(), newFileName.get()), 'w').close()
-    else:
-        os.mkdir(os.path.join(currentPath.get(), newFileName.get()))
-    # destroy the top
-    top.destroy()
-    pathChange()
+#def newFileOrFolder():
+#    # check if it is a file name or a folder
+#    if len(newFileName.get().split('.')) != 1:
+#        open(os.path.join(currentPath.get(), newFileName.get()), 'w').close()
+#    else:
+#        os.mkdir(os.path.join(currentPath.get(), newFileName.get()))
+#    # destroy the top
+#    top.destroy()
+#    pathChange()
 
 def controls(enable):
     if enable: state="normal"
@@ -155,7 +157,10 @@ def chooseCommPort(choice):
     Stat.configure(state='disabled')
     spdm.configure(state='disabled')
     
-
+def cpmFileExists(filename):
+    fne=False
+    if filename in dirfilenames:fne=True
+    return fne
 
 def rmFile():
      if serialport=="-":
@@ -164,12 +169,14 @@ def rmFile():
         for i in list2.curselection():
             print(list2.get(i))
             filename=list2.get(i)
-            #filename=list2.get(list2.curselection())
-            print(filename)
-            cpmdrive=currentDrive.get()
-            RCxxSerial.DoRM(serialport,Speed,StartToken,cpmdrive,filename)
-            time.sleep(0.5)
-        
+            if cpmFileExists(filename):
+                #filename=list2.get(list2.curselection())
+                print(filename)
+                cpmdrive=currentDrive.get()
+                RCxxSerial.DoRM(serialport,Speed,StartToken,cpmdrive,filename)
+                time.sleep(0.5)
+            else:
+                messagebox.showerror('File Error', 'Filename doesnt exist')
         driveChange(cpmdrive)
     
 def refreshDrive():
@@ -180,6 +187,7 @@ def CopyTo(event):
     if serialport=="-":
         messagebox.showerror('Serial Error', 'Not Connected')
     else:
+        
         cpmdrive=currentDrive.get()
         print(event.data)
         files = root.tk.splitlist(event.data)
@@ -187,12 +195,14 @@ def CopyTo(event):
             print(filepath)
            
             filename=os.path.basename(filepath)
-            if RCxxSerial.CheckFilename(filename)==False:
-               messagebox.showerror('File Error', 'Filename incompatible with CPM 8.3 format')
-            else:   
-               RCxxSerial.DoCopyTo(serialport,Speed,StartToken,cpmdrive,filepath,filename,4096)
-               time.sleep(0.5)
-           
+            if not cpmFileExists(filename):
+                if RCxxSerial.CheckFilename(filename)==False:
+                   messagebox.showerror('File Error', 'Filename incompatible with CPM 8.3 format')
+                else:   
+                   RCxxSerial.DoCopyTo(serialport,Speed,StartToken,cpmdrive,filepath,filename,4096)
+                   time.sleep(0.5)
+            else:
+                messagebox.showerror('File Error', 'Filename exists')
         driveChange(cpmdrive)
 
 def CopyFrom():
