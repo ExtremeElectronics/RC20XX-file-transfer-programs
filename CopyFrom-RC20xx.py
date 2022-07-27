@@ -7,6 +7,19 @@ import argparse
 import os
 import RCxxSerial
 
+
+#     ________________________________
+#    /                                |
+#   /       RC20xx  FFS tools         |
+#  /         Derek Woodroffe          |
+# |  O        Extreme Kits            |
+# |     Kits at extkits.uk/RC2040     |
+# |               2022                |
+# |___________________________________|
+#   | | | | | | | | | | | | | | | | |
+
+# https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
+
 StartToken = "&&&-magic-XXX"
 Speed=115200
 

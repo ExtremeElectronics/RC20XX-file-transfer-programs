@@ -9,6 +9,19 @@ import RCxxSerial
 StartToken = "&&&-magic-XXX"
 Speed=115200
 
+
+#     ________________________________
+#    /                                |
+#   /       RC20xx  FFS tools         |
+#  /         Derek Woodroffe          |
+# |  O        Extreme Kits            |
+# |     Kits at extkits.uk/RC2040     |
+# |               2022                |
+# |___________________________________|
+#   | | | | | | | | | | | | | | | | |
+
+# https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
+
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         usage="%(prog)s [PORT] [DRIVE] ...",
