@@ -9,6 +9,19 @@ import os.path
 debug=0;
 crlf='\n';
 
+
+#     ________________________________
+#    /                                |
+#   /       RC20xx  FFS tools         |
+#  /         Derek Woodroffe          |
+# |  O        Extreme Kits            |
+# |     Kits at extkits.uk/RC2040     |
+# |               2022                |
+# |___________________________________|
+#   | | | | | | | | | | | | | | | | |
+
+# https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
+
 #Serial Def's
 
 def ListCommPorts(withdesc=False):
