@@ -32,20 +32,11 @@ debug=args.debug
 
 serialport=args.port 
 if serialport=="": serialport="COM1"
-#Open Serial Port
-ser=RCxxSerial.OpenSerial(serialport,Speed)
 
-#Flush buffers
-RCxxSerial.InitSerial(ser)
+RCxxSerial.DoExit(serialport,Speed)
 
-RCxxSerial.WriteCrLf(ser)
+ # close port
 
-RCxxSerial.FlushOutput(ser)
-RCxxSerial.WriteCrLf(ser)
-
-RCxxSerial.WriteRead(ser,"EXIT","Start")
-RCxxSerial.WriteCrLf(ser)
-RCxxSerial.Close(ser)             # close port
 
 
   

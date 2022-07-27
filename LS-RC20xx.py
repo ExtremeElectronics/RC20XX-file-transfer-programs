@@ -44,30 +44,9 @@ if serialport=="": serialport="COM1"
 drive=args.drive.upper()
 if drive=="": drive="A"
 
-#Open Serial Port
-ser=RCxxSerial.OpenSerial(serialport,Speed)
+# Do the LS 
+b64ls=RCxxSerial.DoLS(serialport,Speed,StartToken,drive)
 
-#Flush buffers
-RCxxSerial.InitSerial(ser)
-
-#send initial string
-RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
-#send command
-RCxxSerial.WriteRead(ser,"LS","LS")
-#send drive and wait for OK
-if b"OK" not in RCxxSerial.WriteRead(ser,drive,"Drive"):
-   print ("No OK returned")
-   RCxxSerial.Close(ser)  
-   sys.exit(1)
-   
-RCxxSerial.WriteRead(ser,"","After OK")   
-#receive data
-b64ls=RCxxSerial.ReadOnly(ser,"b64")
-#remove crlf's
-b64ls=b64ls.replace(b'\r',b'')
-b64ls=b64ls.replace(b'\n',b'')
-#close serial
-RCxxSerial.Close(ser)             # close port
 if debug :print("b64",b64ls)
 
 #decode message

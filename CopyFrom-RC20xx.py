@@ -56,50 +56,17 @@ if len(filename)>12:
     print ("Filename must be 8.3 formatted")
     sys.exit(1)
 
-#Open Serial Port
-ser=RCxxSerial.OpenSerial(serialport,Speed)
-
-#Flush buffers
-RCxxSerial.InitSerial(ser)
-#send initial string
-RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
-#send command
-RCxxSerial.WriteRead(ser,"COPYFROM","COPYFROM")
-#send drive
-RCxxSerial.WriteRead(ser,drive,"Drive")
-
-
 start = time.time()
 
-print("fetching ",filename);
+#Do Copy From
+b64from=RCxxSerial.DoCopyFrom(serialport,Speed,StartToken,drive,filename)
 
-#WriteRead(StartToken,True,"Start")
-#WriteRead("COPYFROM",True,"CopyFrom")
-#WriteRead(drive,True,"Drive")
-
-if debug :print("wait for OK");
-if b"OK" not in RCxxSerial.WriteRead(ser,filename,"Filename"): #read OK
-   print ("No OK returned")
-   RCxxSerial.Close(ser) 
-   sys.exit(1)
-   
-if debug :print("wait for filename");
-RCxxSerial.ReadOnly(ser,"Fn1") #read filename
-RCxxSerial.ReadOnly(ser,"Fn2")
-if debug :print("wait for base64");
-b64ls=RCxxSerial.ReadOnly(ser,"B64")
-if debug :print(b64ls)
-b64ls=b64ls.replace(b'\r',b'')
-b64ls=b64ls.replace(b'\n',b'')
-
-
-RCxxSerial.Close(ser)              # close port
 if debug :print("b64",b64ls)
 
 try:
-  message_bytes = base64.b64decode(b64ls)
+  message_bytes = base64.b64decode(b64from)
 except:
-  print("base 64 decode failed ",b64ls)
+  print("base 64 decode failed ",b64from)
   sys.exit(1)
 
 end = time.time()
@@ -120,8 +87,4 @@ print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f Z/s) " %(totalsize,end-start,
  
 
 if debug: print("in ",end-start);
-
-#WriteRead(EndToken)
-
-
 

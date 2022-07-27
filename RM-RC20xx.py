@@ -48,26 +48,9 @@ if filename=="":
 if len(filename)>12:
     print ("Filename must be 8.3 formatted")
     sys.exit(1)
-    
-#Open Serial Port
-ser=RCxxSerial.OpenSerial(serialport,Speed)
 
-#Flush buffers
-RCxxSerial.InitSerial(ser)
-
-RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
-RCxxSerial.WriteRead(ser,"RM","RM")
-RCxxSerial.WriteRead(ser,drive,"Drive")
-
-txt=RCxxSerial.WriteRead(ser,filename,"OK")
-if b"OK" not in txt :#read OK
-   print ("No OK returned ",txt)
-   RCxxSerial.Close(ser)
-   sys.exit(1)
-   
-
-
-RCxxSerial.Close(ser)            # close port
+#Do RM
+RCxxSerial.DoRM(serialport,Speed,StartToken,drive,filename)  
 
 print ("Removed",filename)
 #WriteRead(EndToken)

@@ -49,86 +49,18 @@ filename=os.path.basename(filepath)
 if debug: print(filepath,filename)
 
 if filename=="":sys.exit(1)
-if len(filename)>12:sys.exit(1)
-
-#Open Serial Port
-ser=RCxxSerial.OpenSerial(serialport,Speed)
-
-#Flush buffers
-RCxxSerial.InitSerial(ser)
-#send initial string
-RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
-#send command
-RCxxSerial.WriteRead(ser,"COPYTO","COPYTO")
-#send drive
-RCxxSerial.WriteRead(ser,drive,"Drive")
+if len(filename)>12:
+    print("filename needs to be 8.3 formatted")
+    sys.exit(1)
 
 #Time the transfer
 start = time.time()
 
-#send filename and wait for OK
-if b"OK" not in RCxxSerial.WriteRead(ser,filename,"Wait for OK") :#read OK
-    print ("No OK returned")
-    RCxxSerial.Close(ser) 
-    sys.exit(1)
-   
-localfile = open(filepath, "rb")
-while True:
-    message_bytes = localfile.read(bufsize)
-    if not message_bytes:
-         if debug :print("EOM");
-         break
-    
-    #txt=RCxxSerial.WriteRead(ser,"","Wait for OK:")
-    #if b"OK" not in txt:
-    #     print(" Not Rceived OK: ", txt)
-    #     RCxxSerial.Close(ser)
-    #     sys.exit(1)
-    
-    txt=RCxxSerial.ReadOnly(ser,"Wait for ChunkSize:")
-    #txt=RCxxSerial.WriteRead(ser,"","Wait for ChunkSize:")
-    if b"Chunk" not in txt:
-         print(" Not Rceived Chunksize: ", txt)
-         RCxxSerial.Close(ser)
-         sys.exit(1)
-   
-    #send chunk size
-    if debug :print("sending chunk ",str(len(message_bytes)) )
-    txt=RCxxSerial.WriteRead(ser,str(len(message_bytes)),"Chunk")
-    if b"Data" not in txt:
-         print(" Not Rceived Data: ", txt)
-         RCxxSerial.Close(ser)
-         sys.exit(1)
-         
-    totalsize+=len(message_bytes)
-    print(".", end='',flush=True)
-    
-    b64ls=base64.b64encode(message_bytes)
-    if debug :print("send base64\n")
-    txt=RCxxSerial.WriteRead(ser,b64ls,"b64",1)
-    if b"OK" not in txt:
-         print(" Not Received OK ", txt)
-         RCxxSerial.Close(ser)
-         sys.exit(1)
-      
-time.sleep(0.1)   
-   
-localfile.close()
-print("")
+#Do Copy to
 
-#send zero chunk
-if debug :print("send zero Chunk");
+totalsize=RCxxSerial.DoCopyTo(serialport,Speed,StartToken,drive,filepath,filename,bufsize)
 
-#ReadOnly()
-txt=RCxxSerial.WriteRead(ser,"0","0")
-if b"OK" not in txt :
-    print ("No OK returned on last chunk ",txt)
-    RCxxSerial.Close(ser) 
-    sys.exit(1)
-   
 end = time.time()
-RCxxSerial.Close(ser)           # close port
-
 print (filepath+" Sent")
 bps=totalsize/(end-start)
 print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f Z/s) " %(totalsize,end-start,bps,bps/zork))

@@ -44,36 +44,15 @@ filename=args.filename
 if filename=="":sys.exit(1)
 if len(filename)>12:sys.exit(1)
 
-#Open Serial Port
-ser=RCxxSerial.OpenSerial(serialport,Speed)
+# Do the CAT
+b64cat=RCxxSerial.DoCat(serialport,Speed,StartToken,drive,filename)
 
-#Flush buffers
-RCxxSerial.InitSerial(ser)
-
-RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
-RCxxSerial.WriteRead(ser,"COPYFROM","CopyFrom")
-RCxxSerial.WriteRead(ser,drive,"Drive")
-
-if debug :print("wait for OK");
-if b"OK" not in RCxxSerial.WriteRead(ser,filename,"FileName"): #read OK
-   print ("No OK returned")
-   sys.exit(1)
-   
-
-RCxxSerial.ReadOnly(ser,"filename") #read filename
-RCxxSerial.ReadOnly(ser,"After Filename")
-
-b64ls=RCxxSerial.ReadOnly(ser,"b64")
-b64ls=b64ls.replace(b'\r',b'')
-b64ls=b64ls.replace(b'\n',b'')
-
-ser.close()             # close port
-if debug :print("b64",b64ls)
+if debug :print("b64",b64cat)
 
 try:
-  message_bytes = base64.b64decode(b64ls)
+  message_bytes = base64.b64decode(b64cat)
 except:
-  print("base 64 decode failed ",b64ls)
+  print("base 64 decode failed ",b64cat)
   sys.exit(1)
 
 print (filename)
@@ -83,11 +62,6 @@ if len(message_bytes)<2:
     sys.exit(1)
 else:
     print(message_bytes.decode('utf_8'))
-
-
-
-
-#WriteRead(EndToken)
 
 
 

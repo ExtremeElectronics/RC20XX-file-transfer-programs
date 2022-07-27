@@ -50,30 +50,9 @@ if not os.path.isdir(path):
     print ("Path does not exist")
     sys.exit(1)
 
-#Open Serial Port
-ser=RCxxSerial.OpenSerial(serialport,Speed)
 
-#Flush buffers
-RCxxSerial.InitSerial(ser)
+b64ls=RCxxSerial.DoLS(serialport,Speed,StartToken,drive)
 
-#send initial string
-RCxxSerial.WriteRead(ser,StartToken,"StartTok")
-#send command
-RCxxSerial.WriteRead(ser,"LS","LS")
-#send drive and wait for OK
-if b"OK" not in RCxxSerial.WriteRead(ser,drive,"Drive"):
-    print ("No OK returned")
-    RCxxSerial.Close(ser)  
-    sys.exit(1)
-   
-RCxxSerial.WriteRead(ser,"","After OK")   
-#receive data
-b64ls=RCxxSerial.ReadOnly(ser,"b64")
-#remove crlf's
-b64ls=b64ls.replace(b'\r',b'')
-b64ls=b64ls.replace(b'\n',b'')
-#close serial
-RCxxSerial.Close(ser)             # close port
 if debug :print("b64",b64ls)
 
 #decode message
@@ -88,18 +67,8 @@ except:
 directory=message_bytes.decode('utf_8')
 #print(directory)
 
-lines=directory.split("\n")
-filenames=[]
-for line in lines:
-    a1=line.split(".")
-    if len(a1)>1:
-        #print(a1[1])
-        a2=a1[1].split(" ")
-        #print(a2)
-        filename=a1[0].strip()+"."+a2[0]
-        #print (filename)
-        if len(filename)<=13:
-            filenames.append(filename)
+
+filenames=RCxxSerial.DirectoryToFilenames(directory)
       
 db=" "
 if debug:db=" -d "
