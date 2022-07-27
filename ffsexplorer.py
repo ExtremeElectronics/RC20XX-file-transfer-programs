@@ -158,12 +158,19 @@ def chooseCommPort(choice):
 
 
 def rmFile():
-    filename=list2.get(list2.curselection())
-    print(filename)
-    cpmdrive=currentDrive.get()
-    RCxxSerial.DoRM(serialport,Speed,StartToken,cpmdrive,filename)
-    time.sleep(0.5)
-    driveChange(cpmdrive)
+     if serialport=="-":
+        messagebox.showerror('Serial Error', 'Not Connected')
+     else:
+        for i in list2.curselection():
+            print(list2.get(i))
+            filename=list2.get(i)
+            #filename=list2.get(list2.curselection())
+            print(filename)
+            cpmdrive=currentDrive.get()
+            RCxxSerial.DoRM(serialport,Speed,StartToken,cpmdrive,filename)
+            time.sleep(0.5)
+        
+        driveChange(cpmdrive)
     
 def refreshDrive():
     cpmdrive=currentDrive.get()
