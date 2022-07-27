@@ -20,15 +20,15 @@ StartToken = "&&&-magic-XXX"
 DrivesMax=15 #A-O
 
 
-#     ________________________________
-#    /                                |
-#   /       RC20xx  FFS tools         |
-#  /         Derek Woodroffe          |
-# |  O        Extreme Kits            |
-# |     Kits at extkits.uk/RC2040     |
-# |               2022                |
-# |___________________________________|
-#   | | | | | | | | | | | | | | | | |
+#     __________________________
+#    /                          |
+#   /    RC20xx  FFS tools      |
+#  /      Derek Woodroffe       |
+# |  O     Extreme Kits         |
+# |   Kits at extkits.uk/RC2040 |
+# |            2022             |
+# |_____________________________|
+#   | | | | | | | | | | | | | |  
 
 # https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
 
@@ -74,30 +74,43 @@ root.grid_rowconfigure(9, weight=3)
 
 drivescrollbar = Scrollbar(root)
 dirfilenames=[]
-
+def initdirectory():
+    list2["state"]="normal"
+    list2.delete(0, END)
+    list2.insert(0,"")
+    list2.insert(1,"    ________________________")
+    list2.insert(2,"   /                        |")
+    list2.insert(3,"  /   RC20xx  FFS tools     |")
+    list2.insert(4," /     Derek Woodroffe      |")
+    list2.insert(5,"|  O    Extreme Kits        |")
+    list2.insert(6,"| Kits at extkits.uk/RC2040 |")
+    list2.insert(7,"|            2022           |")
+    list2.insert(8,"|___________________________|")
+    list2.insert(9," | | | | | | | | | | | | | | | ")
+    list2["state"]="disabled"    
 
 def driveChange(cpmdrive):
     global dirfilenames
-    # Get all Files  from the given CPMDirectory
-    #cpmdrive = os.listdir(currentPath.get())
-    # Clearing the list
-    list2.delete(0, END)
-    # Inserting the files and directories into the list
-    #for file in cpmdrive:
-    #    list2.insert(1, file)
-    currentDrive.set(cpmdrive)
-    b64ls=RCxxSerial.DoLS(serialport,Speed,StartToken,cpmdrive)
-    if debug :print("b64",b64ls)
-    #decode message
-    try:
-        message_bytes = base64.b64decode(b64ls)
-    except:
-        print("decode failed ",b64ls)
-        sys.exit(1)
-    directory=message_bytes.decode('utf_8')
-    dirfilenames=RCxxSerial.DirectoryToFilenames(directory)
-    for i,fn in enumerate(dirfilenames):
-        list2.insert(i,fn)
+    if serialport!="-":
+        # Get all Files  from the given CPMDirectory
+        # Clearing the list
+        list2.delete(0, END)
+        # Inserting the files and directories into the list
+        #for file in cpmdrive:
+        #    list2.insert(1, file)
+        currentDrive.set(cpmdrive)
+        b64ls=RCxxSerial.DoLS(serialport,Speed,StartToken,cpmdrive)
+        if debug :print("b64",b64ls)
+        #decode message
+        try:
+            message_bytes = base64.b64decode(b64ls)
+        except:
+            print("decode failed ",b64ls)
+            sys.exit(1)
+        directory=message_bytes.decode('utf_8')
+        dirfilenames=RCxxSerial.DirectoryToFilenames(directory)
+        for i,fn in enumerate(dirfilenames):
+            list2.insert(i,fn)
 
     #remove selection
     state="disabled"
@@ -296,26 +309,16 @@ list2.config(yscrollcommand = drivescrollbar.set, selectmode = "multiple")
 drivescrollbar.config(command = list2.yview)
 
 list2.grid(sticky='NSEW', column=1, row=2, rowspan=10, ipady=10, ipadx=10, columnspan=5)
-list2.configure(background="black", foreground="green",selectforeground='Black',selectbackground='Green', activestyle='none')
+list2.configure(background="black", foreground="green",selectforeground='Black',selectbackground='Green', activestyle='none',font='Courier 12')
 
 list2.drop_target_register(DND_FILES)
 list2.dnd_bind('<<Drop>>', CopyTo)
 list2.bind('<Button-1>', FilesSelected)
 
 
-
-# Menu
-#menubar = Menu(root)
-# Adding a new File button
-#menubar.add_command(label="Add File or Folder", command=open_popup)
-# Adding a quit button to the Menubar
-#menubar.add_command(label="Quit", command=root.quit)
-# Make the menubar the Main Menu
-#root.config(menu=menubar)
-
-# Call the function so the list displays
-#pathChange('')
 controls(False)
+
+initdirectory()
 
 #serialport= args.port
 #drive=args.drive.upper()
@@ -328,6 +331,5 @@ if not isinstance(args.port, type(None)):
 if not isinstance(args.drive, type(None)):
     driveChange(args.drive.upper())
 
-#driveChange('A')
 # run the main program
 root.mainloop()
