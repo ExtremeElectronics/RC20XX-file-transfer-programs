@@ -18,8 +18,12 @@ The SD card must be using an img style CPM image and you will need to add the im
 
 You need to update your Pico to the latest RC2040 software, currently found in the main (until I make a release)
 
-These scripts need python 3 and you may also need to add in the pyserial module
-"pip install pyserial"
+These scripts need python3 and you may also need to add in the pyserial module
+
+pip install pyserial"
+
+and the tkinterdnd2 module for the ffsexplorer
+pip install tkinterdnd2
 
 ## RM-RC20xx.py
 Removes a file on the host CMP system 
