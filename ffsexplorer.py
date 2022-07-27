@@ -12,6 +12,7 @@ import pathlib
 import RCxxSerial
 import base64
 import time
+import argparse
 
 serialport="-"
 Speed=115200
@@ -33,6 +34,25 @@ DrivesMax=15 #A-O
 
 debug=0
 RCxxSerial.debug=debug
+
+def init_argparse() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s [PORT] [DRIVE] ",
+        description="List CPM Drive on RC20XX."
+    )
+    parser.add_argument(
+        "-v", "--version", action="version",
+        version = f"{parser.prog} version 1.0.0"
+    )
+    
+    parser.add_argument('--port', help="Com or TTY port with an RC20XX attached")
+    parser.add_argument('--drive', help="CPM Drive on the Attached RC20XX")
+   
+    return parser
+
+#Get Command line
+parser = init_argparse()
+args = parser.parse_args()
 
 # Increase Dots Per inch so it looks sharper
 ctypes.windll.shcore.SetProcessDpiAwareness(True)
@@ -88,64 +108,11 @@ def driveSelect(cd):
      print("Drive ",currentDrive.get())
      driveChange(currentDrive.get())   
 
-#def pathChange(*event):
-#    # Get all Files and Folders from the given Directory
-#    directory = os.listdir(currentPath.get())
-#   # Clearing the list
-#   list1.delete(0, END)
-#    # Inserting the files and directories into the list
-#    for file in directory:
-#        list1.insert(0, file)
-
-#def changePathByClick(event=None):
-#    # Get clicked item.
-#    picked = list1.get(list.curselection()[0])
-#    # get the complete path by joining the current path with the picked item
-#    path = os.path.join(currentPath.get(), picked)
-#    # Check if item is file, then open it
-#    if os.path.isfile(path):
-#        print('Opening: '+path)
-#        os.startfile(path)
-#    # Set new path, will trigger pathChange function.
-#    else:
-#        currentPath.set(path)
-
-#def goBack(event=None):
-#    # get the new path
-#    newPath = pathlib.Path(currentPath.get()).parent
-#    # set it to currentPath
-#    currentPath.set(newPath)
-#    # simple message
-#    print('Going Back')
-
-#def open_popup():
-#    global top
-#    top = Toplevel(root)
-#    top.geometry("250x150")
-#    top.resizable(False, False)
-#    top.title("Child Window")
-#    top.columnconfigure(0, weight=1)
-#    Label(top, text='Enter File or Folder name').grid()
-#    Entry(top, textvariable=newFileName).grid(column=0, pady=10, sticky='NSEW')
-#    Button(top, text="Create", command=newFileOrFolder).grid(pady=10, sticky='NSEW')
-
-#def newFileOrFolder():
-#    # check if it is a file name or a folder
-#    if len(newFileName.get().split('.')) != 1:
-#        open(os.path.join(currentPath.get(), newFileName.get()), 'w').close()
-#    else:
-#        os.mkdir(os.path.join(currentPath.get(), newFileName.get()))
-#    # destroy the top
-#    top.destroy()
-#    pathChange()
-
 def controls(enable):
     if enable: state="normal"
     else: state="disabled"
 
     cpmdrive["state"]=state
-    #b3["state"]=state
-    #b4["state"]=state
     b5["state"]=state
     b9["state"]=state
     list2["state"]=state
@@ -349,6 +316,18 @@ list2.bind('<Button-1>', FilesSelected)
 # Call the function so the list displays
 #pathChange('')
 controls(False)
+
+#serialport= args.port
+#drive=args.drive.upper()
+
+print(args.port)
+
+if not isinstance(args.port, type(None)):
+    chooseCommPort(args.port)
+
+if not isinstance(args.drive, type(None)):
+    driveChange(args.drive.upper())
+
 #driveChange('A')
 # run the main program
 root.mainloop()
