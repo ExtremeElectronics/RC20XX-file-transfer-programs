@@ -14,10 +14,12 @@ import base64
 import time
 import argparse
 
-serialport="-"
+serialPortNotSelectedTxt="Select Port"
+serialport=serialPortNotSelectedTxt
 Speed=115200
 StartToken = "&&&-magic-XXX"
 DrivesMax=15 #A-O
+
 
 
 #     __________________________
@@ -91,7 +93,7 @@ def initdirectory():
 
 def driveChange(cpmdrive):
     global dirfilenames
-    if serialport!="-":
+    if serialport!=serialPortNotSelectedTxt:
         # Get all Files  from the given CPMDirectory
         # Clearing the list
         list2.delete(0, END)
@@ -134,19 +136,25 @@ def chooseCommPort(choice):
     global serialport,Status,spdm
     spvar.set(choice)
     serialport = choice
+    serialab.configure(state='normal')
+    serialab.delete('0', END)
     Stat.configure(state='normal')
     Stat.delete('1.0', END)
 
-    if serialport=="-":
+    if serialport==serialPortNotSelectedTxt:
         controls(False)
         Stat.insert('end',"Disconnected")
+        serialab.insert('end',"Connect to RC20XX on ")
+        
     else:
         sp=serialport.split("|")
         serialport=sp[0].strip()
         controls(True)
         driveChange(currentDrive.get())
         Stat.insert('end',"Connected")
+        serialab.insert('end',"Connected to RC20XX on ")
         
+    Stat.configure(state='disabled')
     Stat.configure(state='disabled')
     spdm.configure(state='disabled')
     
@@ -156,7 +164,7 @@ def cpmFileExists(filename):
     return fne
 
 def rmFile():
-     if serialport=="-":
+     if serialport==serialPortNotSelectedTxt:
         messagebox.showerror('Serial Error', 'Not Connected')
      else:
         for i in list2.curselection():
@@ -177,7 +185,7 @@ def refreshDrive():
     driveChange(cpmdrive)
 
 def CopyTo(event):
-    if serialport=="-":
+    if serialport==serialPortNotSelectedTxt:
         messagebox.showerror('Serial Error', 'Not Connected')
     else:
         
@@ -199,7 +207,7 @@ def CopyTo(event):
         driveChange(cpmdrive)
 
 def CopyFrom():
-    if serialport=="-":
+    if serialport==serialPortNotSelectedTxt:
         messagebox.showerror('Serial Error', 'Not Connected')
     else:
         #get destination directory
@@ -237,7 +245,7 @@ def DoExit(event=None):
     global spdm
     RCxxSerial.DoExit(serialport,Speed)
     spdm.configure(state='normal')
-    chooseCommPort("-")   
+    chooseCommPort(serialPortNotSelectedTxt)   
     spdm.configure(state='normal')
     
 top = ''
@@ -245,23 +253,38 @@ cpmDrive="A"
 
 
 #Serial Port Selection
-serialframe=Frame(root,height=10)
-serialframe.grid(row=0,column=0,sticky="NESW",columnspan=3)
-serialab=Label(serialframe,text="Connect to RC20XX on port ")
-serialab.pack(side=LEFT,expand=True,fill=BOTH)
+#serialframe=Frame(root,height=10,background="blue")
+#serialframe.grid(row=0,column=0,sticky="NESW",columnspan=3)
+#serialab=Label(serialframe,text="Connect to RC20XX on port ")
+#serialab.pack(side=LEFT,expand=True,fill=BOTH)
+#sp=RCxxSerial.ListCommPorts(True)
+#sp.append(serialPortNotSelectedTxt)
+#spvar = StringVar()
+#spvar.set(serialport)
+#spdm = OptionMenu(serialframe, spvar,*sp,command=chooseCommPort)
+#spdm.pack(side=LEFT,expand=True,fill=BOTH)
+
+serialab=Entry(root,width=1,justify='right',relief="flat",disabledforeground="BLACK",font='Helvetica 10 bold')
+serialab.insert('end',"Connect to RC20XX on ")
+serialab.grid(row=0,column=0,sticky="NESW")
+serialab.config(state="disabled")
+
 sp=RCxxSerial.ListCommPorts(True)
-sp.append("-")
+sp.append(serialPortNotSelectedTxt)
 spvar = StringVar()
 spvar.set(serialport)
-spdm = OptionMenu(serialframe, spvar,*sp,command=chooseCommPort)
-spdm.pack(side=LEFT,expand=True,fill=BOTH)
+spdm = OptionMenu(root, spvar,*sp,command=chooseCommPort)
+spdm.config(font='Helvetica 10 bold')
+#spdm.pack(side=LEFT,expand=True,fill=BOTH)
+spdm.grid(row=0,column=1,sticky="NESW",columnspan=5)
 
 
 
-#create dropdown for drive
-driveframe=Frame(root,bg="black")
+#create dropdown for drive letter
+driveframe=Frame(root,bg="black",borderwidth="0")
 driveframe.grid(row=1,column=1,sticky="NESW",columnspan=5)
-drivelab=Label(driveframe,text="CPM Drive",fg="GREEN",bg="black",font='Helvetica 14 bold')
+drivelab=Label(driveframe,text="CPM Drive",fg="GREEN",bg="black",font='Helvetica 14 bold'
+               ,relief="solid",borderwidth="0",highlightcolor="black",highlightbackground="black")
 drivelab.pack(side=LEFT,expand=True,fill=BOTH)
 
 Drives=[]
@@ -271,33 +294,36 @@ for d in range(0,DrivesMax):
 currentDrive=StringVar()
 currentDrive.set(cpmDrive)
 cpmdrive = OptionMenu(driveframe, currentDrive,*Drives,command=driveSelect)
-cpmdrive.config(fg="GREEN",bg="black", font='Helvetica 14 bold')
+cpmdrive.config(fg="GREEN",bg="black", font='Helvetica 14 bold',relief="solid"
+                ,borderwidth="0",highlightcolor="black",highlightbackground="black")
 cpmdrive["menu"].config(fg="GREEN",bg="black")
 cpmdrive.pack(side=LEFT,expand=True,fill=BOTH)
 
 
+#seperator
+Frame(root,background="green",highlightcolor="green",highlightbackground="green").grid(sticky='NWSE', column=1, row=3, columnspan=5)
+
+ 
 #buttons
 b3=Button(root, text='Erase', command=rmFile,width=1,state='disabled')
-b3.grid(sticky='NWE', column=0, row=3,padx=5,pady=5)
-
-
+b3.grid(sticky='NWE', column=0, row=4,padx=5,pady=5)
 
 b4=Button(root, text='Copy Selected', command=CopyFrom,width=1,state='disabled')
-b4.grid(sticky='NWE', column=0, row=4,padx=5,pady=5)
+b4.grid(sticky='NWE', column=0, row=5,padx=5,pady=5)
 
 b5=Button(root, text='Refresh', command=refreshDrive,width=1)
-b5.grid(sticky='NWE', column=0, row=5,padx=5,pady=5)
-
-Label(root,text=" ").grid(sticky='NW', column=0, row=7)
-
+b5.grid(sticky='NWE', column=0, row=6,padx=5,pady=5)
+ 
 b9=Button(root, text='Disconnect', command=DoExit,width=1)
-b9.grid(sticky='NWE', column=0, row=8,padx=5,pady=5)
+b9.grid(sticky='NWE', column=0, row=10,padx=5,pady=5)
+
 
 #footer
 Stat=Text(root,height=1,width=100) 
 Stat.insert('end',"Disconnected - Select a serial port to connect")
 Stat.grid(row=12,column=0,columnspan=10)
 Stat.configure(state='disabled')
+
 
 
 #drive scrollbar
@@ -308,22 +334,19 @@ drivescrollbar.pack( side = RIGHT, fill = Y )
 list2.config(yscrollcommand = drivescrollbar.set, selectmode = "multiple")
 drivescrollbar.config(command = list2.yview)
 
-list2.grid(sticky='NSEW', column=1, row=2, rowspan=10, ipady=10, ipadx=10, columnspan=5)
-list2.configure(background="black", foreground="green",selectforeground='Black',selectbackground='Green', activestyle='none',font='Courier 12')
+list2.grid(sticky='NSEW', column=1, row=4, rowspan=8, ipady=10, ipadx=10, columnspan=5)
+list2.configure(background="black", foreground="green",selectforeground='Black',selectbackground='Green',
+                activestyle='none',font='Courier 12',relief="solid",borderwidth="0",highlightcolor="black"
+                ,highlightbackground="black")
 
 list2.drop_target_register(DND_FILES)
 list2.dnd_bind('<<Drop>>', CopyTo)
 list2.bind('<Button-1>', FilesSelected)
 
-
 controls(False)
 
 initdirectory()
 
-#serialport= args.port
-#drive=args.drive.upper()
-
-print(args.port)
 
 if not isinstance(args.port, type(None)):
     chooseCommPort(args.port)
@@ -333,3 +356,4 @@ if not isinstance(args.drive, type(None)):
 
 # run the main program
 root.mainloop()
+
