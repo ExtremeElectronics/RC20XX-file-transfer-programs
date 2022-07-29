@@ -57,6 +57,10 @@ Drop files to the black and green directory display to upload files to your RC20
 Select files in the directory display, to Erase, or Copy slected files to download to a directory on your computer.
 Disconnect to detach from the com port (and exit from file transfer on an RC2040) 
 
+## Port Monitor
+
+Monitors Serial ports and displays current ports attached, and any newly connected.
+
 ## Speed
 CopyTo and CopyFrom give an idea of transfer speed. 
 around 15Kb/s (0.16 Z/s)* should be doable for CopyTo 
