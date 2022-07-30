@@ -18,12 +18,35 @@ The SD card must be using an img style CPM image and you will need to add the im
 
 You need to update your Pico to the latest RC2040 software, currently found in the main (until I make a release)
 
+The SD card must have a valid DiskDef File
+### DISKDEF WARNING ###
+The diskdefs file must have lines terminated in LF ONLY, don't copy/paste the file into an editor then save, it may change them to CRLF's 
+Download and Save as RAW
+
+
+
 These scripts need python3 and you may also need to add in the pyserial module
 
-pip install pyserial"
+pip install pyserial
 
 and the tkinterdnd2 module for the ffsexplorer
 pip install tkinterdnd2
+
+# GUI Programs
+
+## ffsexplorer.py
+A GUI to try to tie everything following together. Probably the easyest one to start with now.
+Connect by selecting a com port (top right)
+Select the drive with the CPM Dive dropdown
+Drop files to the black and green directory display to upload files to your RC20xx
+Select files in the directory display and click on the buttons on the left to Erase, Copy slected files to a directory on your computer.
+Disconnect to detach from the com port (and exit from file transfer on an RC2040) 
+
+## Port Monitor
+Monitors Serial ports and displays current ports attached, and any newly connected ports are highlighted.
+
+# CLI Progams
+These are for your own automation. be carefull with the options, they are currently not agressivly checked for sanity. 
 
 ## RM-RC20xx.py
 Removes a file on the host CMP system 
@@ -49,28 +72,14 @@ Arguments of COM port and CPM Drive letter required
 Sends a code to release the RC2040 from serial file mode. (not needed on the RC2014)
 Argument, needs com port only 
 
-## ffsexplorer.py
-A GUI to try to tie everything together. 
-Connect by selecting a com port 
-Select the drive with the CPM Dive dropdown
-Drop files to the black and green directory display to upload files to your RC20xx
-Select files in the directory display, to Erase, or Copy slected files to download to a directory on your computer.
-Disconnect to detach from the com port (and exit from file transfer on an RC2040) 
 
-## Port Monitor
 
-Monitors Serial ports and displays current ports attached, and any newly connected.
-
-## Speed
+# Transfer Speed
 CopyTo and CopyFrom give an idea of transfer speed. 
 around 15Kb/s (0.16 Z/s)* should be doable for CopyTo 
 and 52Kb/s (0.53 Z/s)* for CopyFrom
 
 *Zorks a second, where 1 ZORK=96K
 
-## DISKDEF WARNING ##
-The diskdefs file must have lines terminated in LF ONLY, don't copy/paste the file into an editor then save, it may change them to CRLF's
-
-Download and Save as RAW
 
 
