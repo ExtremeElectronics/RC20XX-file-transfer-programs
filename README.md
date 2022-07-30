@@ -5,14 +5,14 @@ Transfer / delete/ list / cat files via the serial port (or usb serial port)
 
 ## Your RC20xx needs to reliably boot into and run CP/M before trying to use these tools
 
-The port needs to be the COM port connected to the RC20xx, the program needs exclusive access to this port, no other serial program must be running
+The port needs to be the COM port connected to the RC20xx, the program needs exclusive access to this port, no other serial program must be running.
 On Windows machines the com port will be of the form COMxx 
 On Linux machines the port will be similar to /dev/ttyAMA0 (USB on a pi) , /dev/tty0 or /dev/ttyS0  
 
 In all cases the file path is for the machine running the python program. 
 The filename part of the filepath will be used as the CPM file name when the file is transferred
 
-Drive letters are from A to P  are required for all programs except EXIT
+Drive letters are from A to P and are required for all programs except EXIT
 
 The SD card must be using an img style CPM image and you will need to add the img diskdefs to your SD card from https://github.com/ExtremeElectronics/RC2040/blob/main/DiskDefs/RC2040img_diskdefs.txt to a file called diskdefs (no extension)
 
