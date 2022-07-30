@@ -1,5 +1,5 @@
 # RC20XX Fast File Serial transfer programs
-Python programs to transfer CPM files to/from PC to RC2040 and RC2014 with an XK SD card interface.
+Python programs to transfer CPM files to/from PC to RC2040 (https://github.com/ExtremeElectronics/RC2040) and RC2014 SD Card interface(https://github.com/ExtremeElectronics/Pico-SD--IDE-interface--for-Rc2014) with an XK SD card interface.
 
 Transfer / delete/ list / cat files via the serial port (or usb serial port) 
 
