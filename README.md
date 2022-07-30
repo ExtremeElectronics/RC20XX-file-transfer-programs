@@ -23,14 +23,10 @@ The SD card must have a valid DiskDef File
 The diskdefs file must have lines terminated in LF ONLY, don't copy/paste the file into an editor then save, it may change them to CRLF's 
 Download and Save as RAW
 
+## Python instalation
 
-
-These scripts need python3 and you may also need to add in the pyserial module
-
-pip install pyserial
-
-and the tkinterdnd2 module for the ffsexplorer
-pip install tkinterdnd2
+These scripts need python3.6 or greater and you may also need to add in the pyserial module "pip install pyserial"
+and the tkinterdnd2 module for the ffsexplorer "pip install tkinterdnd2"
 
 # GUI Programs
 
