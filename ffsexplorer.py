@@ -1,7 +1,6 @@
 #pip3 install tkinterdnd2
 #pip3 install pyserial
 
-
 from tkinter import *
 from tkinterdnd2 import *
 from tkinter import messagebox
@@ -59,8 +58,7 @@ args = parser.parse_args()
 # Increase Dots Per inch so it looks sharper
 ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
-#root = Tk()
-
+#create root 
 root=TkinterDnD.Tk()
 
 # set a title for our file explorer main window
@@ -129,7 +127,7 @@ def controls(enable):
 
     cpmdrive["state"]=state
     b5["state"]=state
-    b9["state"]=state
+    b10["state"]=state
     list2["state"]=state
     
 def chooseCommPort(choice):
@@ -149,10 +147,12 @@ def chooseCommPort(choice):
     else:
         sp=serialport.split("|")
         serialport=sp[0].strip()
+        who=RCxxSerial.DoWho(serialport,Speed,StartToken)
         controls(True)
         driveChange(currentDrive.get())
         Stat.insert('end',"Connected")
-        serialab.insert('end',"Connected to RC20XX on ")
+        #serialab.insert('end',"Connected to RC20XX on ")
+        serialab.insert('end',"Connected to "+who+" on ")
         
     Stat.configure(state='disabled')
     Stat.configure(state='disabled')
@@ -241,29 +241,26 @@ def FilesSelected(event):
     b3["state"]=state
     b4["state"]=state
 
-def DoExit(event=None):
+def DoReconnect(event=None):
     global spdm
     RCxxSerial.DoExit(serialport,Speed)
     spdm.configure(state='normal')
     chooseCommPort(serialPortNotSelectedTxt)   
     spdm.configure(state='normal')
     
+def DoDisconnect(event=None):
+    global spdm
+    RCxxSerial.DoExit(serialport,Speed)
+    spdm.configure(state='normal')
+    chooseCommPort(serialPortNotSelectedTxt)   
+    spdm.configure(state='normal')
+
+    
+    
 top = ''
 cpmDrive="A"
 
-
-#Serial Port Selection
-#serialframe=Frame(root,height=10,background="blue")
-#serialframe.grid(row=0,column=0,sticky="NESW",columnspan=3)
-#serialab=Label(serialframe,text="Connect to RC20XX on port ")
-#serialab.pack(side=LEFT,expand=True,fill=BOTH)
-#sp=RCxxSerial.ListCommPorts(True)
-#sp.append(serialPortNotSelectedTxt)
-#spvar = StringVar()
-#spvar.set(serialport)
-#spdm = OptionMenu(serialframe, spvar,*sp,command=chooseCommPort)
-#spdm.pack(side=LEFT,expand=True,fill=BOTH)
-
+#serialport selection
 serialab=Entry(root,width=1,justify='right',relief="flat",disabledforeground="BLACK",font='Helvetica 10 bold')
 serialab.insert('end',"Connect to RC20XX on ")
 serialab.grid(row=0,column=0,sticky="NESW")
@@ -313,9 +310,12 @@ b4.grid(sticky='NWE', column=0, row=5,padx=5,pady=5)
 
 b5=Button(root, text='Refresh', command=refreshDrive,width=1)
 b5.grid(sticky='NWE', column=0, row=6,padx=5,pady=5)
+
+#b6=Button(root, text='Reconnect', command=DoReconnect,width=1)
+#b6.grid(sticky='NWE', column=0, row=7,padx=5,pady=5)
  
-b9=Button(root, text='Disconnect', command=DoExit,width=1)
-b9.grid(sticky='NWE', column=0, row=10,padx=5,pady=5)
+b10=Button(root, text='Disconnect', command=DoDisconnect,width=1)
+b10.grid(sticky='NWE', column=0, row=10,padx=5,pady=5)
 
 
 #footer

@@ -170,6 +170,22 @@ def CheckFilename(filename):
 
 #File Move commands
 
+def DoWho(serialport,Speed,StartToken):
+    #Open Serial Port
+    ser=OpenSerial(serialport,Speed)
+
+    #Flush buffers
+    InitSerial(ser)
+
+    #send initial string
+    WriteRead(ser,StartToken,"Start Ok")
+    #send command
+    WriteRead(ser,"WHO","WHO")
+    who=ReadOnly(ser,"who?").decode()
+    #close serial
+    Close(ser)             # close port
+    return who.strip()
+
 
 
 def DoLS(serialport,Speed,StartToken,drive):
