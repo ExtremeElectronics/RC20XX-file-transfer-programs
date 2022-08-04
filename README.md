@@ -68,7 +68,9 @@ Arguments of COM port and CPM Drive letter required
 Sends a code to release the RC2040 from serial file mode. (not needed on the RC2014)
 Argument, needs com port only 
 
-
+## WHO-RC20xx.py
+Returns RC2040 or RC2014 depending on the device the COM port is connected to
+Argument, needs com port only 
 
 # Transfer Speed
 CopyTo and CopyFrom give an idea of transfer speed. 
