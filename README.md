@@ -64,7 +64,7 @@ the path is only used on the host.
 Lists a directory on the CPM Filesystem 
 Arguments of COM port and CPM Drive letter required
 
-## EXIT-RC20xx.py
+## EXIT-RC2040.py
 Sends a code to release the RC2040 from serial file mode. (not needed on the RC2014)
 Argument, needs com port only 
 
