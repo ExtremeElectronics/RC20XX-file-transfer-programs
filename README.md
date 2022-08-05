@@ -79,8 +79,8 @@ and 52Kb/s (0.53 Z/s)* for CopyFrom
 
 *Zorks a second, where 1 ZORK=96K
 
-Non Transfer Programs.
+# Non Transfer Programs.
 
-# WATCH-RC2040.py
+## WATCH-RC2040.py
 Sets a memory watch on an RC2040 ONLY
 Arguments, needs com port and Hex Watch Address
