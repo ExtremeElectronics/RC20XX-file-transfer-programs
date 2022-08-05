@@ -36,6 +36,8 @@ DrivesMax=15 #A-O
 debug=0
 RCxxSerial.debug=debug
 
+who=""
+
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         usage="%(prog)s [PORT] [DRIVE] ",
@@ -114,8 +116,8 @@ def driveChange(cpmdrive):
 
     #remove selection
     state="disabled"
-    b3["state"]=state
-    b4["state"]=state
+    EraseBut["state"]=state
+    CSelBut["state"]=state
         
 def driveSelect(cd):
      print("Drive ",currentDrive.get())
@@ -126,12 +128,12 @@ def controls(enable):
     else: state="disabled"
 
     cpmdrive["state"]=state
-    b5["state"]=state
-    b10["state"]=state
+    RefreshBut["state"]=state
+    DisConBut["state"]=state
     list2["state"]=state
     
 def chooseCommPort(choice):
-    global serialport,Status,spdm
+    global serialport,Status,spdm,who
     spvar.set(choice)
     serialport = choice
     serialab.configure(state='normal')
@@ -238,8 +240,8 @@ def CopyFrom():
 
 def FilesSelected(event):
     state="normal"
-    b3["state"]=state
-    b4["state"]=state
+    EraseBut["state"]=state
+    CSelBut["state"]=state
 
 def DoReconnect(event=None):
     global spdm
@@ -302,20 +304,20 @@ Frame(root,background="green",highlightcolor="green",highlightbackground="green"
 
  
 #buttons
-b3=Button(root, text='Erase', command=rmFile,width=1,state='disabled')
-b3.grid(sticky='NWE', column=0, row=4,padx=5,pady=5)
+EraseBut=Button(root, text='Erase', command=rmFile,width=1,state='disabled')
+EraseBut.grid(sticky='NWE', column=0, row=4,padx=5,pady=5)
 
-b4=Button(root, text='Copy Selected', command=CopyFrom,width=1,state='disabled')
-b4.grid(sticky='NWE', column=0, row=5,padx=5,pady=5)
+CSelBut=Button(root, text='Copy Selected', command=CopyFrom,width=1,state='disabled')
+CSelBut.grid(sticky='NWE', column=0, row=5,padx=5,pady=5)
 
-b5=Button(root, text='Refresh', command=refreshDrive,width=1)
-b5.grid(sticky='NWE', column=0, row=6,padx=5,pady=5)
+RefreshBut=Button(root, text='Refresh', command=refreshDrive,width=1)
+RefreshBut.grid(sticky='NWE', column=0, row=6,padx=5,pady=5)
 
 #b6=Button(root, text='Reconnect', command=DoReconnect,width=1)
 #b6.grid(sticky='NWE', column=0, row=7,padx=5,pady=5)
  
-b10=Button(root, text='Disconnect', command=DoDisconnect,width=1)
-b10.grid(sticky='NWE', column=0, row=10,padx=5,pady=5)
+DisConBut=Button(root, text='Disconnect', command=DoDisconnect,width=1)
+DisConBut.grid(sticky='NWE', column=0, row=10,padx=5,pady=5)
 
 
 #footer

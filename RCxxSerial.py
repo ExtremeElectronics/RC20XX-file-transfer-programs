@@ -186,6 +186,26 @@ def DoWho(serialport,Speed,StartToken):
     Close(ser)             # close port
     return who.strip()
 
+def DoWatch(serialport,Speed,StartToken,Address):
+    #Open Serial Port
+    ser=OpenSerial(serialport,Speed)
+
+    #Flush buffers
+    InitSerial(ser)
+
+    #send initial string
+    WriteRead(ser,StartToken,"Start Ok")
+    #send command
+    WriteRead(ser,"WATCH","WATCH")
+    time.sleep(0.1)
+    if b"OK" not in WriteRead(ser,str(Address),str(Address)):
+       print ("No OK returned")
+    else :
+       print ("Watch address set to ",str(Address))
+    #close serial
+    Close(ser)             # close port
+    return 
+
 
 
 def DoLS(serialport,Speed,StartToken,drive):

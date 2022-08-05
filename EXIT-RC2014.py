@@ -1,10 +1,9 @@
-import base64
-import argparse
-import time
 import serial
 import io
+import time
+import base64
 import sys
-import os
+import argparse
 import RCxxSerial
 
 
@@ -23,10 +22,11 @@ import RCxxSerial
 StartToken = "&&&-magic-XXX"
 Speed=115200
 
+
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         usage="%(prog)s [PORT] ...",
-        description="Return System Name for RC20XX."
+        description="EXIT Serial File Mode on RC2040."
     )
     parser.add_argument(
         "-v", "--version", action="version",
@@ -35,14 +35,7 @@ def init_argparse() -> argparse.ArgumentParser:
     parser.add_argument('-debug', help="Set Debug",action='store_true')
     
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
- 
     return parser
-
-def DoExec(cmd):
-    stream = os.popen(cmd)
-    output = stream.read()
-    print(cmd)
-    print(output)
 
 #Get Command line
 parser = init_argparse()
@@ -50,13 +43,17 @@ args = parser.parse_args()
 
 debug=args.debug
 
-serialport= args.port
+serialport=args.port 
 if serialport=="": serialport="COM1"
 
-# Do the WHO 
-who=RCxxSerial.DoWho(serialport,Speed,StartToken)
+RCxxSerial.DoExit(serialport,Speed)
+
+ # close port
+
+
 
   
-#print it  
-print ("WHO:",who)
+print ("EXIT")
+
+
 

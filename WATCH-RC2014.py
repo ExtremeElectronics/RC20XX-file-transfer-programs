@@ -25,8 +25,8 @@ Speed=115200
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        usage="%(prog)s [PORT] ...",
-        description="Return System Name for RC20XX."
+        usage="%(prog)s [PORT] [Address] ...",
+        description="Set Watch Address on RC2014."
     )
     parser.add_argument(
         "-v", "--version", action="version",
@@ -35,6 +35,7 @@ def init_argparse() -> argparse.ArgumentParser:
     parser.add_argument('-debug', help="Set Debug",action='store_true')
     
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
+    parser.add_argument('address', help="HEX Memory Address 0000-ffff to watch" )
  
     return parser
 
@@ -49,14 +50,18 @@ parser = init_argparse()
 args = parser.parse_args()
 
 debug=args.debug
+RCxxSerial.debug=debug
 
 serialport= args.port
 if serialport=="": serialport="COM1"
 
-# Do the WHO 
-who=RCxxSerial.DoWho(serialport,Speed,StartToken)
+address=int(args.address, 16)
 
-  
-#print it  
-print ("WHO:",who)
+
+# Do the Watch
+RCxxSerial.DoWatch(serialport,Speed,StartToken,address)
+
+# do EXIT
+RCxxSerial.DoExit(serialport,Speed)
+
 
