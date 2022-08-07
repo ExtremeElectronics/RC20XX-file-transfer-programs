@@ -175,7 +175,7 @@ def commtimer():
              list2.insert(END, line)
              list2.yview(END)
 
-    root.after(20, commtimer)
+    root.after(10, commtimer)
 
 
     
@@ -272,14 +272,13 @@ def DoDis():
         #send command
         RCxxSerial.WriteRead(ser,"DISSEMBLE","DISSEMBLE")
         time.sleep(0.1)
-        if b"OK" not in RCxxSerial.WriteRead(ser,str(Address),str(Address)):
+        if b"OK" not in RCxxSerial.WriteRead(ser,adh,adh):
             print ("No OK returned")
         else :
-            print ("DISSEMBLE ",str(Address))
+            print ("DISSEMBLE ",adh)
             list2.insert(END, "DISSEMBLE ")
             list2.yview(END)
-        RCxxSerial.WriteOnly(ser,crlf,"crlf")
-
+       
 def setAddress(text):
     AddressBox.delete(0,END)
     AddressBox.insert(0,text)
