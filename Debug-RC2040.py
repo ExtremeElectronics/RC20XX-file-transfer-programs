@@ -50,7 +50,7 @@ def init_argparse() -> argparse.ArgumentParser:
     )
     
     
-    parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
+    parser.add_argument('-port', help="Com or TTY port with an RC20XX attached")
  
     return parser
 
@@ -129,6 +129,7 @@ def chooseCommPort(choice):
         
         
         ser=RCxxSerial.OpenSerial(serialport,Speed)
+        RCxxSerial.WriteOnly(ser,"sdf45"+crlf,"crlf")
         RCxxSerial.WriteOnly(ser,crlf,"crlf")
         commtimer()
         
@@ -157,7 +158,8 @@ def DoDisconnect(event=None):
     
 
 def commtimer():
-    global ser,buffer
+    global ser,buffer,DoRx
+    
     cw=ser.inWaiting()
     if cw>0:
        buffer+=ser.read(cw).decode()
@@ -173,9 +175,10 @@ def commtimer():
              list2.insert(END, line)
              list2.yview(END)
 
-
-         
     root.after(20, commtimer)
+
+
+    
 
 #def DoCr():
 #    RCxxSerial.WriteOnly(ser,"test"+crlf,"crlf")
@@ -191,7 +194,7 @@ def DoExit():
 
 
 def GetAddress():
-    ok=True
+    
     Address=AddressBox.get()
     ad=-1
     try:
@@ -200,62 +203,69 @@ def GetAddress():
         ok=False
     
     if ad<0 or ad>0xffff:
-        ok=False
-
-    if ok==False :
+        ad=-1
+    if ad==-1 :
         messagebox.showwarning(title="Address/Number", message="Address/Number out of range 0-0xffff")
         
     return ad
     
 def DoWatch():
     Address=GetAddress()
+    adh=f'{Address:X}'
     if Address>=0:
         #send initial string
         RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
         #send command
         RCxxSerial.WriteRead(ser,"WATCH","WATCH")
         time.sleep(0.1)
-        if b"OK" not in RCxxSerial.WriteRead(ser,str(Address),str(Address)):
+        if b"OK" not in RCxxSerial.WriteRead(ser,adh,adh):
             print ("No OK returned")
         else :
-            print ("Watch address set to ",str(Address))
-            list2.insert(END, "Watch address set to ",str(Address))
+            print ("Watch address set to ",adh)
+            list2.insert(END, "Watch address set to ",adh)
             list2.yview(END)
         DoExit()
    
 def DoTrace():
     Address=GetAddress()
+    adh=f'{Address:X}'
     if Address>=0:
         #send initial string
         RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
         #send command
         RCxxSerial.WriteRead(ser,"TRACE","TRACE")
         time.sleep(0.1)
-        if b"OK" not in RCxxSerial.WriteRead(ser,str(Address),str(Address)):
+        if b"OK" not in RCxxSerial.WriteRead(ser,adh,adh):
             print ("No OK returned")
         else :
-            print ("Trace set to ",str(ad))
-            list2.insert(END, "Trace set to ",str(Address))
+            print ("Trace set to ",adh)
+            list2.insert(END, "Trace set to ",adh)
             list2.yview(END)
         DoExit()
 
 def DoMDump():
+    
     Address=GetAddress()
+    adh=f'{Address:X}'
     if Address>=0:
+        #commTimerStop()
         #send initial string
         RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
         #send command
         RCxxSerial.WriteRead(ser,"DUMP","DUMP")
         time.sleep(0.1)
-        if b"OK" not in RCxxSerial.WriteRead(ser,str(Address),str(Address)):
+        
+        if b"OK" not in RCxxSerial.WriteRead(ser,adh,adh):
             print ("No OK returned")
         else :
-            print ("DUMPING ",str(Address))
+            print ("DUMPING ",adh)
             list2.insert(END, "DUMPING ")
             list2.yview(END)
         
+        
 def DoDis():
     Address=GetAddress()
+    adh=f'{Address:X}'
     if Address>=0:
         #send initial string
         RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
@@ -268,6 +278,7 @@ def DoDis():
             print ("DISSEMBLE ",str(Address))
             list2.insert(END, "DISSEMBLE ")
             list2.yview(END)
+        RCxxSerial.WriteOnly(ser,crlf,"crlf")
 
 def setAddress(text):
     AddressBox.delete(0,END)
@@ -353,4 +364,4 @@ if not isinstance(args.port, type(None)):
 
 # run the main program
 root.mainloop()
-
+RCxxSerial.Close(ser)     

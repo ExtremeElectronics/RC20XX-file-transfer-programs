@@ -48,8 +48,8 @@ def init_argparse() -> argparse.ArgumentParser:
         version = f"{parser.prog} version 1.0.0"
     )    
    
-    parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
-    parser.add_argument('drive', help="CPM Drive on the Attached RC20XX")
+    parser.add_argument('-port', help="Com or TTY port with an RC20XX attached")
+    parser.add_argument('-drive', help="CPM Drive on the Attached RC20XX")
    
     return parser
 
