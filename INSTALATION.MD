@@ -2,7 +2,7 @@
 
 As with most python programs, the issue is not with the programs, but getting a working set of python modules and paths
 
-### all tools
+### All tools
 These tools need python3.6 or greater
 
 All of the tools require the pyserial module, this is usually installed with pip or pip3
