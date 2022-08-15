@@ -20,3 +20,6 @@ e.g. "pip3 install tkinterdnd2"
 Glad you asked, not a clue :) but I'm sure with a bit of python knoledge they are installable. 
 If you have a method that works, please contact me and I'll add it here
 
+## Raspberry PI and 32bit systems. 
+installing tkinterdnd2 with pip, appears to load the 64 bit version, even if you have a 32bit OS and therefore won't run. I suspect this may be the same for other 32bit systems. This only affects ffsexplorer.py
+Sorry no fix for this currently
