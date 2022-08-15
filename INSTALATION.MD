@@ -16,6 +16,8 @@ e.g apt-get install python-tk
 For ffexplorer you will need the tkinterdnd2 package this is usually installed with pip or pip3
 e.g. "pip3 install tkinterdnd2"
 
+The ffsexplorer.py uses 'Courier' as fixed width font, Its helps formatting if this font is available in X. 
+
 ## Apple MAC / IPAD 
 Glad you asked, not a clue :) but I'm sure with a bit of python knoledge they are installable. 
 If you have a method that works, please contact me and I'll add it here
