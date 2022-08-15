@@ -28,6 +28,8 @@ Download and Save as RAW
 These scripts need python3.6 or greater and you may also need to add in the pyserial module "pip install pyserial"
 and the tkinterdnd2 module for the ffsexplorer "pip install tkinterdnd2" 
 
+for more information, see INSTALATION.MD
+
 # GUI Programs
 
 ## ffsexplorer.py
