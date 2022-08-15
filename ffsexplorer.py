@@ -1,5 +1,7 @@
 #pip3 install tkinterdnd2
 #pip3 install pyserial
+#pip3 install tkdnd
+
 
 from tkinter import *
 from tkinterdnd2 import *
@@ -57,8 +59,8 @@ def init_argparse() -> argparse.ArgumentParser:
 parser = init_argparse()
 args = parser.parse_args()
 
-# Increase Dots Per inch so it looks sharper
-ctypes.windll.shcore.SetProcessDpiAwareness(True)
+# Increase Dots Per inch so it looks sharper Windows only
+#ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
 #create root 
 root=TkinterDnD.Tk()
