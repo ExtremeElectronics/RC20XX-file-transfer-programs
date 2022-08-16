@@ -253,13 +253,13 @@ def DoReconnect(event=None):
     spdm.configure(state='normal')
     
 def DoDisconnect(event=None):
-    global spdm
+    global spdm,root
     RCxxSerial.DoExit(serialport,Speed)
     spdm.configure(state='normal')
     chooseCommPort(serialPortNotSelectedTxt)   
     spdm.configure(state='normal')
 
-    exit(0)
+    root.destroy()
     
 top = ''
 cpmDrive="A"
@@ -364,5 +364,9 @@ if not isinstance(args.drive, type(None)):
 
 # run the main program
 root.mainloop()
-RCxxSerial.Close(ser)
+try:
+    RCxxSerial.Close(ser)
+except:
+    pass
 
+  
