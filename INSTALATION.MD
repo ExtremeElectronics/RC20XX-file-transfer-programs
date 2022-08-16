@@ -18,6 +18,9 @@ e.g. "pip3 install tkinterdnd2"
 
 The ffsexplorer.py uses 'Courier' as fixed width font, Its helps formatting if this font is available in X. 
 
+## Linux Permissions 
+if you get a permission denied error when accessing the port, ensure the user is a member of the dialout group
+
 ## Apple MAC / IPAD 
 Glad you asked, not a clue :) but I'm sure with a bit of python knoledge they are installable. 
 If you have a method that works, please contact me and I'll add it here
