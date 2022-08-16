@@ -1,6 +1,6 @@
+#pip3 install tkinter (may be a module installed with your OS)
 #pip3 install tkinterdnd2
 #pip3 install pyserial
-#pip3 install tkdnd
 
 
 from tkinter import *
@@ -259,7 +259,7 @@ def DoDisconnect(event=None):
     chooseCommPort(serialPortNotSelectedTxt)   
     spdm.configure(state='normal')
 
-    
+    exit(0)
     
 top = ''
 cpmDrive="A"
@@ -339,14 +339,18 @@ list2.config(yscrollcommand = drivescrollbar.set, selectmode = "multiple")
 drivescrollbar.config(command = list2.yview)
 
 list2.grid(sticky='NSEW', column=1, row=4, rowspan=8, ipady=10, ipadx=10, columnspan=5)
+#list2.configure(background="black", foreground="green",selectforeground='Black',selectbackground='Green',
+#                activestyle='none',font='Courier 12',relief="solid",borderwidth="0",highlightcolor="black"
+#                ,highlightbackground="black")
 list2.configure(background="black", foreground="green",selectforeground='Black',selectbackground='Green',
-                activestyle='none',font='Courier 12',relief="solid",borderwidth="0",highlightcolor="black"
+                activestyle='none',font='Courier',relief="solid",borderwidth="0",highlightcolor="black"
                 ,highlightbackground="black")
 
 list2.drop_target_register(DND_FILES)
 list2.dnd_bind('<<Drop>>', CopyTo)
 list2.bind('<Button-1>', FilesSelected)
-
+#selection lost on focus change bug fix - https://stackoverflow.com/questions/30266213/tkinter-listbox-loses-its-selection-when-clicking-elsewhere-on-the-form
+list2.configure(exportselection=False)
 controls(False)
 
 initdirectory()
