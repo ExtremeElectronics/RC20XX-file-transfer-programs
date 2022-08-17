@@ -3,7 +3,7 @@
 As with most python programs, the issue is not with the programs, but getting a working set of python modules and paths
 
 ### All tools
-These tools need python3.6 or greater. Currently there are some issues that appear under the GUI in Linux, I'm looking in to these.
+These tools need python3.6 or greater.
 
 All of the tools require the pyserial module, this is usually installed with pip or pip3
 e.g. "pip3 install pyserial"
@@ -13,7 +13,7 @@ For these you will need tkinter, in windows this is provided along with the pyth
 In Linux you may have to add this to your OS as a installable "package" in your OS's package manager
 e.g apt-get install python-tk 
 
-For ffexplorer you will need the tkinterdnd2 package this is usually installed with pip or pip3
+For ffexplorer you will need the tkinterdnd2 package too this is usually installed with pip or pip3
 e.g. "pip3 install tkinterdnd2"
 
 The ffsexplorer.py uses 'Courier' as fixed width font, Its helps formatting if this font is available in X. 
