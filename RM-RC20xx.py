@@ -20,7 +20,7 @@ import RCxxSerial
 # https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
 
 StartToken = "&&&-magic-XXX"
-Speed=115200
+Speed = 115200
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -29,7 +29,7 @@ def init_argparse() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-v", "--version", action="version",
-        version = f"{parser.prog} version 1.0.0"
+        version=f"{parser.prog} version 1.0.0"
     )
     parser.add_argument('-debug', help="Set Debug",action='store_true')
 
@@ -45,28 +45,24 @@ args = parser.parse_args()
 debug=args.debug
 RCxxSerial.debug=debug
 
-
-
-serialport=args.port #.upper()
-if serialport=="": serialport="COM1"
-drive=args.drive.upper()
-if drive=="": drive="A"
+serialport = args.port
+if serialport == "": serialport="COM1"
+drive = args.drive.upper()
+if drive == "": drive="A"
 
 filename=args.filename
 
-if filename=="":
-    print ("Filename can't be empty")
+if filename == "":
+    print("Filename can't be empty")
     sys.exit(1)
     
-if len(filename)>12:
-    print ("Filename must be 8.3 formatted")
+if len(filename) > 12:
+    print("Filename must be 8.3 formatted")
     sys.exit(1)
 
 #Do RM
-RCxxSerial.DoRM(serialport,Speed,StartToken,drive,filename)  
+RCxxSerial.DoRM(serialport, Speed, StartToken, drive, filename)
 
-print ("Removed",filename)
-#WriteRead(EndToken)
-
+print("Removed", filename)
 
 

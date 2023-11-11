@@ -21,7 +21,8 @@ import RCxxSerial
 # https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
 
 StartToken = "&&&-magic-XXX"
-Speed=115200
+Speed = 115200
+
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -30,14 +31,15 @@ def init_argparse() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-v", "--version", action="version",
-        version = f"{parser.prog} version 1.0.0"
+        version=f"{parser.prog} version 1.0.0"
     )
-    parser.add_argument('-debug', help="Set Debug",action='store_true')
+    parser.add_argument('-debug', help="Set Debug", action='store_true')
     
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
     parser.add_argument('address', help="HEX Memory Address 0000-ffff to watch" )
  
     return parser
+
 
 def DoExec(cmd):
     stream = os.popen(cmd)
@@ -45,23 +47,24 @@ def DoExec(cmd):
     print(cmd)
     print(output)
 
-#Get Command line
+
+# Get Command line
 parser = init_argparse()
 args = parser.parse_args()
 
 debug=args.debug
-RCxxSerial.debug=debug
+RCxxSerial.debug = debug
 
-serialport= args.port
-if serialport=="": serialport="COM1"
+serialport = args.port
+if serialport == "": serialport = "COM1"
 
-address=int(args.address, 16)
+address = int(args.address, 16)
 
 
 # Do the Watch
-RCxxSerial.DoWatch(serialport,Speed,StartToken,address)
+RCxxSerial.DoWatch(serialport, Speed, StartToken, address)
 
 # do EXIT
-RCxxSerial.DoExit(serialport,Speed)
+RCxxSerial.DoExit(serialport, Speed)
 
 

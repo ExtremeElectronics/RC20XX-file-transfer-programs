@@ -21,7 +21,8 @@ import RCxxSerial
 # https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
 
 StartToken = "&&&-magic-XXX"
-Speed=115200
+Speed = 115200
+
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -30,13 +31,14 @@ def init_argparse() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-v", "--version", action="version",
-        version = f"{parser.prog} version 1.0.0"
+        version=f"{parser.prog} version 1.0.0"
     )
     parser.add_argument('-debug', help="Set Debug",action='store_true')
     
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
  
     return parser
+
 
 def DoExec(cmd):
     stream = os.popen(cmd)
@@ -50,13 +52,12 @@ args = parser.parse_args()
 
 debug=args.debug
 
-serialport= args.port
-if serialport=="": serialport="COM1"
+serialport = args.port
+if serialport == "": serialport = "COM1"
 
 # Do the WHO 
-who=RCxxSerial.DoWho(serialport,Speed,StartToken)
+who = RCxxSerial.DoWho(serialport,Speed,StartToken)
 
-  
-#print it  
-print ("WHO:",who)
+# print it
+print("WHO:", who)
 
