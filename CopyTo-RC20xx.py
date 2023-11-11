@@ -21,7 +21,8 @@ import RCxxSerial
 # https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
 
 StartToken = "&&&-magic-XXX"
-Speed=115200
+Speed = 115200
+
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -40,43 +41,44 @@ def init_argparse() -> argparse.ArgumentParser:
     
     return parser
 
+
 parser = init_argparse()
 args = parser.parse_args()
 
-debug=args.debug
-RCxxSerial.debug=debug
+debug = args.debug
+RCxxSerial.debug = debug
 
-bufsize=(4*1024) #needs to be EXACTLY 4096  else cpmWrite fails
+bufsize = (4*1024)  # needs to be EXACTLY 4096  else cpmWrite fails
 
-zork=96000
-totalsize=0
+zork = 96000
+totalsize = 0
 
-serialport=args.port 
-if serialport=="": serialport="COM1"
+serialport = args.port
+if serialport == "": serialport = "COM1"
 
 drive=args.drive.upper()
-if drive=="": drive="A"
+if drive == "": drive = "A"
 
-filepath=args.filepath
-filename=os.path.basename(filepath)
-if debug: print(filepath,filename)
+filepath = args.filepath
+filename = os.path.basename(filepath)
+if debug: print(filepath, filename)
 
-if filename=="":sys.exit(1)
-if len(filename)>12:
+if filename == "": sys.exit(1)
+if len(filename) > 12:
     print("filename needs to be 8.3 formatted")
     sys.exit(1)
 
-#Time the transfer
+# Time the transfer
 start = time.time()
 
-#Do Copy to
+# Do Copy to
 
-totalsize=RCxxSerial.DoCopyTo(serialport,Speed,StartToken,drive,filepath,filename,bufsize)
+totalsize = RCxxSerial.DoCopyTo(serialport,Speed,StartToken,drive,filepath,filename,bufsize)
 
 end = time.time()
-print (filepath+" Sent")
-bps=totalsize/(end-start)
-print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f Z/s) " %(totalsize,end-start,bps,bps/zork))
+print(filepath+" Sent")
+bps = totalsize/(end-start)
+print("%d Bytes in %0.3f Seconds, %0.0f B/s (%0.3f Z/s) " % (totalsize, end-start, bps, bps/zork))
       
 
 

@@ -377,5 +377,3 @@ if not isinstance(args.drive, type(None)):
 # run the main program
 root.mainloop()
 
-
-  

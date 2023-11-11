@@ -14,13 +14,13 @@ import time
 import argparse
 import serial
 
-serialPortNotSelectedTxt="Select Port"
-serialport=serialPortNotSelectedTxt
-Speed=115200
+serialPortNotSelectedTxt = "Select Port"
+serialport = serialPortNotSelectedTxt
+Speed = 115200
 StartToken = "&&&-magic-XXX"
 
-crlf='\n';
-buffer=""
+crlf = '\n'
+buffer = ""
 
 #     __________________________
 #    /                          |
@@ -34,10 +34,11 @@ buffer=""
 
 # https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
 
-debug=0
+debug = 0
 RCxxSerial.debug=debug
 
-who=""
+who = ""
+
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -48,20 +49,20 @@ def init_argparse() -> argparse.ArgumentParser:
         "-v", "--version", action="version",
         version = f"{parser.prog} version 1.0.0"
     )
-    
-    
+
     parser.add_argument('-port', help="Com or TTY port with an RC20XX attached")
  
     return parser
 
-#Get Command line
+
+# Get Command line
 parser = init_argparse()
 args = parser.parse_args()
 
 # Increase Dots Per inch so it looks sharper
 ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
-#create root 
+# create root
 root=TkinterDnD.Tk()
 
 # set a title for our file explorer main window
@@ -70,13 +71,15 @@ root.title('RC2040 - DEBUG TOOL')
 root.geometry("1024x800")
 root.resizable(1, 1)
 
-#root.grid_columnconfigure(0, weight=10)
+# root.grid_columnconfigure(0, weight=10)
 root.grid_columnconfigure(2, weight=20)
 
 root.grid_rowconfigure(9, weight=3)
 
 drivescrollbar = Scrollbar(root)
-dirfilenames=[]
+dirfilenames = []
+
+
 def initterm():
     list2["state"]="normal"
     list2.delete(0, END)
@@ -93,7 +96,6 @@ def initterm():
     list2["state"]="disabled"    
 
 
-
 def controls(enable):
     if enable: state="normal"
     else: state="disabled"
@@ -104,9 +106,10 @@ def controls(enable):
     DumpBut["state"]=state
     ExitBut["state"]=state
     list2["state"]=state
-    
+
+
 def chooseCommPort(choice):
-    global serialport,Status,spdm,ser
+    global serialport, Status, spdm, ser
     spvar.set(choice)
     serialport = choice
     serialab.configure(state='normal')
@@ -126,8 +129,7 @@ def chooseCommPort(choice):
         controls(True)
         
         Stat.insert('end',"Connected")
-        
-        
+
         ser=RCxxSerial.OpenSerial(serialport,Speed)
         RCxxSerial.WriteOnly(ser,"sdf45"+crlf,"crlf")
         RCxxSerial.WriteOnly(ser,crlf,"crlf")
@@ -138,13 +140,9 @@ def chooseCommPort(choice):
     spdm.configure(state='disabled')
     
 
-
-
-
-    
 def DoDisconnect(event=None):
     global spdm
-    #RCxxSerial.DoExit(serialport,Speed)
+    # RCxxSerial.DoExit(serialport,Speed)
     RCxxSerial.WriteCrLf(ser)
 
     RCxxSerial.FlushOutput(ser)
@@ -152,13 +150,13 @@ def DoDisconnect(event=None):
 
     RCxxSerial.WriteRead(ser,"EXIT","Start")
     RCxxSerial.WriteCrLf(ser)
-    #spdm.configure(state='normal')
-    #chooseCommPort(serialPortNotSelectedTxt)   
-    #spdm.configure(state='normal')
+    # spdm.configure(state='normal')
+    # chooseCommPort(serialPortNotSelectedTxt)
+    # spdm.configure(state='normal')
     
 
 def commtimer():
-    global ser,buffer,DoRx
+    global ser, buffer, DoRx
     
     cw=ser.inWaiting()
     if cw>0:
@@ -177,11 +175,6 @@ def commtimer():
 
     root.after(10, commtimer)
 
-
-    
-
-#def DoCr():
-#    RCxxSerial.WriteOnly(ser,"test"+crlf,"crlf")
 
 def DoExit():
     RCxxSerial.WriteCrLf(ser)
@@ -208,21 +201,22 @@ def GetAddress():
         messagebox.showwarning(title="Address/Number", message="Address/Number out of range 0-0xffff")
         
     return ad
-    
+
+
 def DoWatch():
     Address=GetAddress()
     adh=f'{Address:X}'
     if Address>=0:
-        #send initial string
-        RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
-        #send command
-        RCxxSerial.WriteRead(ser,"WATCH","WATCH")
+        # send initial string
+        RCxxSerial.WriteRead(ser, StartToken, "Start Ok")
+        # send command
+        RCxxSerial.WriteRead(ser, "WATCH", "WATCH")
         time.sleep(0.1)
         if b"OK" not in RCxxSerial.WriteRead(ser,adh,adh):
             print ("No OK returned")
         else :
-            print ("Watch address set to ",adh)
-            list2.insert(END, "Watch address set to ",adh)
+            print ("Watch address set to ", adh)
+            list2.insert(END, "Watch address set to ", adh)
             list2.yview(END)
         DoExit()
    
@@ -231,15 +225,15 @@ def DoTrace():
     adh=f'{Address:X}'
     if Address>=0:
         #send initial string
-        RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
+        RCxxSerial.WriteRead(ser, StartToken, "Start Ok")
         #send command
-        RCxxSerial.WriteRead(ser,"TRACE","TRACE")
+        RCxxSerial.WriteRead(ser, "TRACE", "TRACE")
         time.sleep(0.1)
-        if b"OK" not in RCxxSerial.WriteRead(ser,adh,adh):
+        if b"OK" not in RCxxSerial.WriteRead(ser, adh, adh):
             print ("No OK returned")
         else :
-            print ("Trace set to ",adh)
-            list2.insert(END, "Trace set to ",adh)
+            print ("Trace set to ", adh)
+            list2.insert(END, "Trace set to ", adh)
             list2.yview(END)
         DoExit()
 
@@ -250,15 +244,15 @@ def DoMDump():
     if Address>=0:
         #commTimerStop()
         #send initial string
-        RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
+        RCxxSerial.WriteRead(ser, StartToken, "Start Ok")
         #send command
-        RCxxSerial.WriteRead(ser,"DUMP","DUMP")
+        RCxxSerial.WriteRead(ser, "DUMP", "DUMP")
         time.sleep(0.1)
         
-        if b"OK" not in RCxxSerial.WriteRead(ser,adh,adh):
+        if b"OK" not in RCxxSerial.WriteRead(ser, adh, adh):
             print ("No OK returned")
         else :
-            print ("DUMPING ",adh)
+            print ("DUMPING ", adh)
             list2.insert(END, "DUMPING ")
             list2.yview(END)
         
@@ -268,14 +262,14 @@ def DoDis():
     adh=f'{Address:X}'
     if Address>=0:
         #send initial string
-        RCxxSerial.WriteRead(ser,StartToken,"Start Ok")
+        RCxxSerial.WriteRead(ser,StartToken, "Start Ok")
         #send command
-        RCxxSerial.WriteRead(ser,"DISSEMBLE","DISSEMBLE")
+        RCxxSerial.WriteRead(ser, "DISSEMBLE", "DISSEMBLE")
         time.sleep(0.1)
-        if b"OK" not in RCxxSerial.WriteRead(ser,adh,adh):
+        if b"OK" not in RCxxSerial.WriteRead(ser, adh, adh):
             print ("No OK returned")
         else :
-            print ("DISSEMBLE ",adh)
+            print ("DISSEMBLE ", adh)
             list2.insert(END, "DISSEMBLE ")
             list2.yview(END)
        
@@ -290,9 +284,9 @@ top = ''
 
 
 #serialport selection
-serialab=Entry(root,width=1,justify='right',relief="flat",disabledforeground="BLACK",font='Helvetica 10 bold')
+serialab=Entry(root, width=1, justify='right', relief="flat", disabledforeground="BLACK", font='Helvetica 10 bold')
 serialab.insert('end',"Connect to RC20XX on ")
-serialab.grid(row=0,column=0,sticky="NESW")
+serialab.grid(row=0, column=0, sticky="NESW")
 serialab.config(state="disabled")
 
 sp=RCxxSerial.ListCommPorts(True)
@@ -301,56 +295,56 @@ spvar = StringVar()
 spvar.set(serialport)
 spdm = OptionMenu(root, spvar,*sp,command=chooseCommPort)
 spdm.config(font='Helvetica 10 bold')
-spdm.grid(row=0,column=1,sticky="NESW",columnspan=5)
+spdm.grid(row=0, column=1, sticky="NESW", columnspan=5)
 
 #frame  for address box and label
 AddrFr=Frame(root,borderwidth="0",padx=5,pady=5)
-AddrFr.grid(row=5,column=0,sticky="NESW")
+AddrFr.grid(row=5, column=0, sticky="NESW")
 
 #Address box Label
 Addrlab=Label(AddrFr,text="Addr/Num Hex ")
-Addrlab.pack(side=LEFT,expand=True,fill=BOTH)
+Addrlab.pack(side=LEFT, expand=True, fill=BOTH)
 
 #Address Box
 AddressBox=Entry(AddrFr,width=10,)
-AddressBox.pack(side=LEFT,expand=True,fill=BOTH)
+AddressBox.pack(side=LEFT, expand=True, fill=BOTH)
 
 
 WatchBut=Button(root, text='Watch', command=DoWatch,width=1,state='disabled')
-WatchBut.grid(sticky='NWE', column=0, row=6,padx=5,pady=5)
+WatchBut.grid(sticky='NWE', column=0, row=6, padx=5, pady=5)
 
-TraceBut=Button(root, text='Trace', command=DoTrace,width=1,state='disabled')
-TraceBut.grid(sticky='NWE', column=0, row=7,padx=5,pady=5)
+TraceBut=Button(root, text='Trace', command=DoTrace, width=1,state='disabled')
+TraceBut.grid(sticky='NWE', column=0, row=7, padx=5, pady=5)
 
 DumpBut=Button(root, text='Mem Dump', command=DoMDump,width=1,state='disabled')
-DumpBut.grid(sticky='NWE', column=0, row=8,padx=5,pady=5)
+DumpBut.grid(sticky='NWE', column=0, row=8, padx=5, pady=5)
 
 DisBut=Button(root, text='Mem Dis', command=DoDis,width=1,state='disabled')
-DisBut.grid(sticky='NWE', column=0, row=9,padx=5,pady=5)
+DisBut.grid(sticky='NWE', column=0, row=9,padx=5, pady=5)
  
 ExitBut=Button(root, text='EXIT', command=DoDisconnect,width=1,state='disabled')
-ExitBut.grid(sticky='NWE', column=0, row=10,padx=5,pady=5)
+ExitBut.grid(sticky='NWE', column=0, row=10,padx=5, pady=5)
 
 
 #footer
-Stat=Text(root,height=1,width=100) 
-Stat.insert('end',"Disconnected - Select a serial port to connect")
-Stat.grid(row=12,column=0,columnspan=10)
+Stat = Text(root, height=1, width=100)
+Stat.insert('end', "Disconnected - Select a serial port to connect")
+Stat.grid(row=12, column=0, columnspan=10)
 Stat.configure(state='disabled')
 
 
 #terminal scrollbar
 list2 = Listbox(root) 
 drivescrollbar = Scrollbar(list2)
-drivescrollbar.pack( side = RIGHT, fill = Y )
+drivescrollbar.pack(side=RIGHT, fill=Y)
 
 list2.config(yscrollcommand = drivescrollbar.set, selectmode = "multiple")
 drivescrollbar.config(command = list2.yview)
 
 list2.grid(sticky='NSEW', column=1, row=4, rowspan=8, ipady=10, ipadx=10, columnspan=5)
 list2.configure(background="black", foreground="green",selectforeground='Black',selectbackground='Green',
-                activestyle='none',font='Courier 12',relief="solid",borderwidth="0",highlightcolor="black"
-                ,highlightbackground="black")
+                activestyle='none', font='Courier 12', relief="solid", borderwidth="0", highlightcolor="black"
+                , highlightbackground="black")
 
 
 controls(False)

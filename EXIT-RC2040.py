@@ -20,7 +20,7 @@ import RCxxSerial
 # https://github.com/ExtremeElectronics/RC20XX-file-transfer-programs
 
 StartToken = "&&&-magic-XXX"
-Speed=115200
+Speed = 115200
 
 
 def init_argparse() -> argparse.ArgumentParser:
@@ -32,7 +32,7 @@ def init_argparse() -> argparse.ArgumentParser:
         "-v", "--version", action="version",
         version = f"{parser.prog} version 1.0.0"
     )
-    parser.add_argument('-debug', help="Set Debug",action='store_true')
+    parser.add_argument('-debug', help="Set Debug", action='store_true')
     
     parser.add_argument('port', help="Com or TTY port with an RC20XX attached")
     return parser
@@ -41,19 +41,14 @@ def init_argparse() -> argparse.ArgumentParser:
 parser = init_argparse()
 args = parser.parse_args()
 
-debug=args.debug
+debug = args.debug
 
-serialport=args.port 
-if serialport=="": serialport="COM1"
+serialport = args.port
+if serialport == "": serialport = "COM1"
+# close port
+RCxxSerial.DoExit(serialport, Speed)
 
-RCxxSerial.DoExit(serialport,Speed)
-
- # close port
-
-
-
-  
-print ("EXIT")
+print("EXIT")
 
 
 

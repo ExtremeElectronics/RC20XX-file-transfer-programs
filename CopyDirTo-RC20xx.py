@@ -23,7 +23,7 @@ def init_argparse() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-v", "--version", action="version",
-        version = f"{parser.prog} version 1.0.0"
+        version=f"{parser.prog} version 1.0.0"
     )
     parser.add_argument('-debug', help="Set Debug",action='store_true')
     
@@ -36,36 +36,34 @@ def init_argparse() -> argparse.ArgumentParser:
 def DoExec(cmd):
     stream = os.popen(cmd)
     output = stream.read()
-    if debug:print(cmd)
+    if debug: print(cmd)
     print(output)
 
 
 parser = init_argparse()
 args = parser.parse_args()
 
-debug=args.debug
+debug = args.debug
 
+serialport = args.port
+if serialport == "": serialport = "COM1"
 
-serialport=args.port 
-if serialport=="": serialport="COM1"
+drive = args.drive.upper()
+if drive == "": drive = "A"
 
-drive=args.drive.upper()
-if drive=="": drive="A"
-
-path=args.path
-#filename=os.path.basename(filepath)
+path = args.path
+# filename=os.path.basename(filepath)
 if debug: print(path)
 
 
-
-db=" "
-if debug:db=" -d "
+db = " "
+if debug: db = " -d "
 
 for file in os.listdir(path):
-  pathfile=os.path.join(path, file)
-  pythonpath=sys.executable
-  if os.path.isfile(pathfile):
-    cmd=pythonpath+" CopyTo-RC20xx.py " + serialport + db + drive + " " + pathfile
-    DoExec(cmd ) 
-    time.sleep(0.1)
+    pathfile = os.path.join(path, file)
+    pythonpath = sys.executable
+    if os.path.isfile(pathfile):
+        cmd=pythonpath+" CopyTo-RC20xx.py " + serialport + db + drive + " " + pathfile
+        DoExec(cmd )
+        time.sleep(0.1)
   
