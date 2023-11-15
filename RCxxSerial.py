@@ -6,6 +6,7 @@ import serial.tools.list_ports
 import base64
 import os.path
 
+
 debug = 0
 crlf = '\n'
 
@@ -55,8 +56,7 @@ def ReadOnly(ser, dbt):
 def WriteRead(ser, text, dbt, binary=0):
     if debug: print("Write ", dbt)
     ser.flushInput()
-    # ser.write((text+crlf).encode('utf_8'))  # write a string
-    
+
     if binary == 0:
         ser.write((text+crlf).encode('utf_8'))  # write a string
     else:
@@ -306,7 +306,7 @@ def DoCopyTo(serialport, Speed, StartToken, drive, filepath, filename, bufsize):
 
     # send filename and wait for OK
     if b"OK" not in WriteRead(ser, filename, "Wait for OK"):  # read OK
-        print("No OK returned (cleck file donesn't already Exist)")
+        print("No OK returned (cleck file doesn't already Exist)")
         Close(ser) 
         sys.exit(1)
 
@@ -328,7 +328,7 @@ def DoCopyTo(serialport, Speed, StartToken, drive, filepath, filename, bufsize):
         txt = WriteRead(ser, str(len(message_bytes)), "Chunk")
         if b"Data" not in txt:
             print(" Not Rceived Data: ", txt)
-            RCxxSerial.Close(ser)
+            Close(ser)
             sys.exit(1)
              
         totalsize += len(message_bytes)
@@ -361,11 +361,13 @@ def DoCopyTo(serialport, Speed, StartToken, drive, filepath, filename, bufsize):
     return totalsize
 
 
-def DoRM(serialport, Speed, StartToken, drive, filename):
+def DoRM(serialport, Speed, StartToken, drive, filepath ):
 
-    if CheckFilename(filename) == False:
-        print("Invalid Filename ", filename)
-        sys.exit(1)    
+    try:
+        localfile = open(filepath, "rb")
+    except:
+        print("Cant open", filepath)
+        sys.exit(1)
 
     # Open Serial Port
     ser = OpenSerial(serialport, Speed)
@@ -426,6 +428,73 @@ def DoCopyFrom(serialport, Speed, StartToken, drive, filename):
     return b64from
 
 
+def DoProgram(serialport, Speed, StartToken, filepath, Address):
+    if os.path.isfile(filepath) == False:
+        print("File doesn't Exist ", filepath)
+        sys.exit(1)
+
+    totalsize = 0
+
+    # Open Serial Port
+    ser = OpenSerial(serialport, Speed)
+
+    # Flush buffers
+    InitSerial(ser)
+    # send initial string
+    WriteRead(ser, StartToken, "Start Ok")
+    # send command
+    # WriteRead(ser, "PROGRAM", "PROGRAM")
+    WriteRead(ser, "PROGRAM", "Wait for OK")
+
+    if b"OK" not in WriteRead(ser, str(Address), "Wait for OK"):  # read OK
+        print("No OK returned after Address")
+        Close(ser)
+        sys.exit(1)
+
+    try:
+        localfile = open(filepath, "rb")
+    except:
+        print("Cant open", filepath)
+        sys.exit(1)
+
+    while True:
+        message_bytes = localfile.read(1024)
+        if not message_bytes:
+            if debug: print("EOM")
+            break
+
+        txt = ReadOnly(ser, "Wait for ChunkSize:")
+
+        if b"Chunk" not in txt:
+            print(" Not Rceived Chunksize: ", txt)
+            Close(ser)
+            sys.exit(1)
+
+        # send chunk size
+        if debug: print("sending chunk ", str(len(message_bytes)))
+        txt = WriteRead(ser, str(len(message_bytes)), "Chunk")
+        if b"Data" not in txt:
+            print(" Not Rceived Data: ", txt)
+            Close(ser)
+            sys.exit(1)
+
+        totalsize += len(message_bytes)
+        print(".", end='', flush=True)
+
+        b64ls = base64.b64encode(message_bytes)
+        if debug: print("send base64\n", b64ls)
+        txt = WriteRead(ser, b64ls, "b64", 1)
+        if b"OK" not in txt:
+            print(" Not Received OK ", txt)
+            Close(ser)
+            sys.exit(1)
+    WriteRead(ser, "0", "0Chunk")
+    time.sleep(0.1)
+
+    localfile.close()
+    print("")
+    return totalsize
+
 def DoExit(serialport, Speed):
     # Open Serial Port
     ser = OpenSerial(serialport, Speed)
@@ -441,3 +510,4 @@ def DoExit(serialport, Speed):
     WriteRead(ser, "EXIT", "Start")
     WriteCrLf(ser)
     Close(ser)            
+

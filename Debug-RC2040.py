@@ -47,7 +47,7 @@ def init_argparse() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-v", "--version", action="version",
-        version = f"{parser.prog} version 1.0.0"
+        version=f"{parser.prog} version 1.0.0"
     )
 
     parser.add_argument('-port', help="Com or TTY port with an RC20XX attached")
@@ -63,7 +63,7 @@ args = parser.parse_args()
 ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
 # create root
-root=TkinterDnD.Tk()
+root = TkinterDnD.Tk()
 
 # set a title for our file explorer main window
 root.title('RC2040 - DEBUG TOOL')
@@ -81,18 +81,18 @@ dirfilenames = []
 
 
 def initterm():
-    list2["state"]="normal"
+    list2["state"] = "normal"
     list2.delete(0, END)
-    list2.insert(0,"")
-    list2.insert(1,"    ________________________")
-    list2.insert(2,"   /                        |")
-    list2.insert(3,"  /   RC2040 DEBUG tools    |")
-    list2.insert(4," /     Derek Woodroffe      |")
-    list2.insert(5,"|  O    Extreme Kits        |")
-    list2.insert(6,"| Kits at extkits.uk/RC2040 |")
-    list2.insert(7,"|            2022           |")
-    list2.insert(8,"|___________________________|")
-    list2.insert(9," | | | | | | | | | | | | | | | ")
+    list2.insert(0, "")
+    list2.insert(1, "    ________________________")
+    list2.insert(2, "   /                        |")
+    list2.insert(3, "  /   RC2040 DEBUG tools    |")
+    list2.insert(4, " /     Derek Woodroffe      |")
+    list2.insert(5, "|  O    Extreme Kits        |")
+    list2.insert(6, "| Kits at extkits.uk/RC2040 |")
+    list2.insert(7, "|            2022           |")
+    list2.insert(8, "|___________________________|")
+    list2.insert(9, " | | | | | | | | | | | | | | | ")
     list2["state"]="disabled"    
 
 
@@ -100,12 +100,12 @@ def controls(enable):
     if enable: state="normal"
     else: state="disabled"
 
-    WatchBut["state"]=state
-    TraceBut["state"]=state
-    DisBut["state"]=state
-    DumpBut["state"]=state
-    ExitBut["state"]=state
-    list2["state"]=state
+    WatchBut["state"] = state
+    TraceBut["state"] = state
+    DisBut["state"] = state
+    DumpBut["state"] = state
+    ExitBut["state"] = state
+    list2["state"] = state
 
 
 def chooseCommPort(choice):
@@ -117,10 +117,10 @@ def chooseCommPort(choice):
     Stat.configure(state='normal')
     Stat.delete('1.0', END)
 
-    if serialport==serialPortNotSelectedTxt:
+    if serialport == serialPortNotSelectedTxt:
         controls(False)
-        Stat.insert('end',"Disconnected")
-        serialab.insert('end',"Connect to RC20XX on ")
+        Stat.insert('end', "Disconnected")
+        serialab.insert('end', "Connect to RC20XX on ")
         
     else:
         sp=serialport.split("|")
@@ -128,11 +128,11 @@ def chooseCommPort(choice):
         
         controls(True)
         
-        Stat.insert('end',"Connected")
+        Stat.insert('end', "Connected")
 
-        ser=RCxxSerial.OpenSerial(serialport,Speed)
-        RCxxSerial.WriteOnly(ser,"sdf45"+crlf,"crlf")
-        RCxxSerial.WriteOnly(ser,crlf,"crlf")
+        ser=RCxxSerial.OpenSerial(serialport, Speed)
+        RCxxSerial.WriteOnly(ser, "sdf45"+crlf, "crlf")
+        RCxxSerial.WriteOnly(ser, crlf, "crlf")
         commtimer()
         
     Stat.configure(state='disabled')
@@ -159,19 +159,19 @@ def commtimer():
     global ser, buffer, DoRx
     
     cw=ser.inWaiting()
-    if cw>0:
-       buffer+=ser.read(cw).decode()
+    if cw > 0:
+       buffer += ser.read(cw).decode()
        
     if crlf in buffer:
-         line,buffer=buffer.split('\n',1)
-         islist=True
-         print ("!"+line+"!")
-         if 'Start?:' in line: islist=False
-         if 'EXIT FILE MODE' in line: islist=False
+        line, buffer = buffer.split('\n', 1)
+        islist = True
+        print("!"+line+"!")
+        if 'Start?:' in line: islist=False
+        if 'EXIT FILE MODE' in line: islist=False
            
-         if islist:
-             list2.insert(END, line)
-             list2.yview(END)
+        if islist:
+            list2.insert(END, line)
+            list2.yview(END)
 
     root.after(10, commtimer)
 
@@ -182,31 +182,31 @@ def DoExit():
     RCxxSerial.FlushOutput(ser)
     RCxxSerial.WriteCrLf(ser)
 
-    RCxxSerial.WriteRead(ser,"EXIT","Start")
+    RCxxSerial.WriteRead(ser, "EXIT", "Start")
     RCxxSerial.WriteCrLf(ser)
 
 
 def GetAddress():
     
-    Address=AddressBox.get()
-    ad=-1
+    Address = AddressBox.get()
+    ad = -1
     try:
-       ad=int(Address, base=16)
+       ad = int(Address, base=16)
     except:
         ok=False
     
-    if ad<0 or ad>0xffff:
-        ad=-1
-    if ad==-1 :
+    if ad < 0 or ad>0xffff:
+        ad = -1
+    if ad == -1:
         messagebox.showwarning(title="Address/Number", message="Address/Number out of range 0-0xffff")
         
     return ad
 
 
 def DoWatch():
-    Address=GetAddress()
-    adh=f'{Address:X}'
-    if Address>=0:
+    Address = GetAddress()
+    adh = f'{Address:X}'
+    if Address >= 0:
         # send initial string
         RCxxSerial.WriteRead(ser, StartToken, "Start Ok")
         # send command
@@ -221,9 +221,9 @@ def DoWatch():
         DoExit()
    
 def DoTrace():
-    Address=GetAddress()
-    adh=f'{Address:X}'
-    if Address>=0:
+    Address = GetAddress()
+    adh = f'{Address:X}'
+    if Address >= 0:
         #send initial string
         RCxxSerial.WriteRead(ser, StartToken, "Start Ok")
         #send command
@@ -239,9 +239,9 @@ def DoTrace():
 
 def DoMDump():
     
-    Address=GetAddress()
-    adh=f'{Address:X}'
-    if Address>=0:
+    Address = GetAddress()
+    adh = f'{Address:X}'
+    if Address >= 0:
         #commTimerStop()
         #send initial string
         RCxxSerial.WriteRead(ser, StartToken, "Start Ok")
@@ -250,42 +250,41 @@ def DoMDump():
         time.sleep(0.1)
         
         if b"OK" not in RCxxSerial.WriteRead(ser, adh, adh):
-            print ("No OK returned")
+            print("No OK returned")
         else :
-            print ("DUMPING ", adh)
+            print("DUMPING ", adh)
             list2.insert(END, "DUMPING ")
             list2.yview(END)
         
         
 def DoDis():
-    Address=GetAddress()
-    adh=f'{Address:X}'
-    if Address>=0:
+    Address = GetAddress()
+    adh = f'{Address:X}'
+    if Address >= 0:
         #send initial string
         RCxxSerial.WriteRead(ser,StartToken, "Start Ok")
         #send command
         RCxxSerial.WriteRead(ser, "DISSEMBLE", "DISSEMBLE")
         time.sleep(0.1)
         if b"OK" not in RCxxSerial.WriteRead(ser, adh, adh):
-            print ("No OK returned")
+            print("No OK returned")
         else :
-            print ("DISSEMBLE ", adh)
+            print("DISSEMBLE ", adh)
             list2.insert(END, "DISSEMBLE ")
             list2.yview(END)
-       
+
+
 def setAddress(text):
-    AddressBox.delete(0,END)
-    AddressBox.insert(0,text)
+    AddressBox.delete(0, END)
+    AddressBox.insert(0, text)
     return        
 
     
 top = ''
 
-
-
-#serialport selection
-serialab=Entry(root, width=1, justify='right', relief="flat", disabledforeground="BLACK", font='Helvetica 10 bold')
-serialab.insert('end',"Connect to RC20XX on ")
+# serialport selection
+serialab = Entry(root, width=1, justify='right', relief="flat", disabledforeground="BLACK", font='Helvetica 10 bold')
+serialab.insert('end', "Connect to RC20XX on ")
 serialab.grid(row=0, column=0, sticky="NESW")
 serialab.config(state="disabled")
 
@@ -293,47 +292,47 @@ sp=RCxxSerial.ListCommPorts(True)
 sp.append(serialPortNotSelectedTxt)
 spvar = StringVar()
 spvar.set(serialport)
-spdm = OptionMenu(root, spvar,*sp,command=chooseCommPort)
+spdm = OptionMenu(root, spvar, *sp, command=chooseCommPort)
 spdm.config(font='Helvetica 10 bold')
 spdm.grid(row=0, column=1, sticky="NESW", columnspan=5)
 
-#frame  for address box and label
-AddrFr=Frame(root,borderwidth="0",padx=5,pady=5)
+# frame  for address box and label
+AddrFr = Frame(root, borderwidth="0", padx=5, pady=5)
 AddrFr.grid(row=5, column=0, sticky="NESW")
 
-#Address box Label
-Addrlab=Label(AddrFr,text="Addr/Num Hex ")
+# Address box Label
+Addrlab = Label(AddrFr, text="Addr/Num Hex ")
 Addrlab.pack(side=LEFT, expand=True, fill=BOTH)
 
-#Address Box
-AddressBox=Entry(AddrFr,width=10,)
+# Address Box
+AddressBox = Entry(AddrFr,width=10,)
 AddressBox.pack(side=LEFT, expand=True, fill=BOTH)
 
 
-WatchBut=Button(root, text='Watch', command=DoWatch,width=1,state='disabled')
+WatchBut = Button(root, text='Watch', command=DoWatch,width=1,state='disabled')
 WatchBut.grid(sticky='NWE', column=0, row=6, padx=5, pady=5)
 
-TraceBut=Button(root, text='Trace', command=DoTrace, width=1,state='disabled')
+TraceBut = Button(root, text='Trace', command=DoTrace, width=1,state='disabled')
 TraceBut.grid(sticky='NWE', column=0, row=7, padx=5, pady=5)
 
-DumpBut=Button(root, text='Mem Dump', command=DoMDump,width=1,state='disabled')
+DumpBut = Button(root, text='Mem Dump', command=DoMDump,width=1,state='disabled')
 DumpBut.grid(sticky='NWE', column=0, row=8, padx=5, pady=5)
 
-DisBut=Button(root, text='Mem Dis', command=DoDis,width=1,state='disabled')
-DisBut.grid(sticky='NWE', column=0, row=9,padx=5, pady=5)
+DisBut = Button(root, text='Mem Dis', command=DoDis,width=1,state='disabled')
+DisBut.grid(sticky='NWE', column=0, row=9, padx=5, pady=5)
  
-ExitBut=Button(root, text='EXIT', command=DoDisconnect,width=1,state='disabled')
-ExitBut.grid(sticky='NWE', column=0, row=10,padx=5, pady=5)
+ExitBut = Button(root, text='EXIT', command=DoDisconnect,width=1,state='disabled')
+ExitBut.grid(sticky='NWE', column=0, row=10, padx=5, pady=5)
 
 
-#footer
+# footer
 Stat = Text(root, height=1, width=100)
 Stat.insert('end', "Disconnected - Select a serial port to connect")
 Stat.grid(row=12, column=0, columnspan=10)
 Stat.configure(state='disabled')
 
 
-#terminal scrollbar
+# terminal scrollbar
 list2 = Listbox(root) 
 drivescrollbar = Scrollbar(list2)
 drivescrollbar.pack(side=RIGHT, fill=Y)
@@ -342,7 +341,7 @@ list2.config(yscrollcommand = drivescrollbar.set, selectmode = "multiple")
 drivescrollbar.config(command = list2.yview)
 
 list2.grid(sticky='NSEW', column=1, row=4, rowspan=8, ipady=10, ipadx=10, columnspan=5)
-list2.configure(background="black", foreground="green",selectforeground='Black',selectbackground='Green',
+list2.configure(background="black", foreground="green", selectforeground='Black', selectbackground='Green',
                 activestyle='none', font='Courier 12', relief="solid", borderwidth="0", highlightcolor="black"
                 , highlightbackground="black")
 
