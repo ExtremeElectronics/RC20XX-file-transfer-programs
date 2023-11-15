@@ -30,7 +30,9 @@ and the tkinterdnd2 module for the ffsexplorer "pip install tkinterdnd2"
 
 for more information, see INSTALATION.MD
 
-# GUI Programs
+In general any program that ends RC20XX can be used on both RC2040 and the Micro SD Card Module. If a file ends in RC2040 that can only be run on an RC2040
+
+# File related GUI Programs
 
 ## ffsexplorer.py
 A GUI to try to tie everything following together. Probably the easyest one to start with now.
@@ -39,6 +41,10 @@ Select the drive with the CPM Dive dropdown
 Drop files to the black and green directory display to upload files to your RC20xx
 Select files in the directory display and click on the buttons on the left to Erase, Copy slected files to a directory on your computer.
 Disconnect to detach from the com port (and exit from file transfer on an RC2040) 
+
+# Non file GUI's
+## Debug-RC2040.py
+A GUI to set a Watch on a memory Address (results in the serial terminal). Set Trace debugging against the processor and disk commands (results in the seial terminal), Dumps 2K of memory starting at Address to the Debug tool window, or Disassemble the memory at an Address to the Debug tool window.
 
 ## Port Monitor
 Monitors Serial ports and displays current ports attached, and any newly connected ports are highlighted.
@@ -81,7 +87,10 @@ and 52Kb/s (0.53 Z/s)* for CopyFrom
 
 *Zorks a second, where 1 ZORK=96K
 
-# Non Transfer Programs.
+# Non File Transfer Programs.
+## Program-RC2040.py 
+(needs an RC2040.uf2 compiled later than 15-11-2023) 
+Allows you to dump a bin file directly into the RC2040s ROM or RAM
 
 ## WATCH-RC2040.py
 Sets a memory watch on an RC2040 ONLY
